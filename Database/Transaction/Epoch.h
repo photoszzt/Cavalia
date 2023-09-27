@@ -35,7 +35,7 @@ namespace Cavalia {
 			void Start() {
 				while (true) {
 					boost::this_thread::sleep(boost::posix_time::milliseconds(40));
-					++curr_epoch_;
+					curr_epoch_ = curr_epoch_ + 1;
 				}
 			}
 

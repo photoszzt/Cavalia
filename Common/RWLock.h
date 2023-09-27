@@ -20,11 +20,11 @@ public:
 			else {
 				if (lock_type_ == NO_LOCK) {
 					lock_type_ = READ_LOCK;
-					++reader_count_;
+					reader_count_ = reader_count_ + 1;
 				}
 				else {
 					assert(lock_type_ == READ_LOCK);
-					++reader_count_;
+					reader_count_ = reader_count_ + 1;
 				}
 				spinlock_.Unlock();
 				return;
@@ -37,11 +37,11 @@ public:
 		spinlock_.Lock();
 		if (lock_type_ == NO_LOCK) {
 			lock_type_ = READ_LOCK;
-			++reader_count_;
+			reader_count_ = reader_count_ + 1;
 			rt = true;
 		}
 		else if (lock_type_ == READ_LOCK) {
-			++reader_count_;
+			reader_count_ = reader_count_ + 1;
 			rt = true;
 		}
 		else {
@@ -83,7 +83,7 @@ public:
 
 	void ReleaseReadLock() {
 		spinlock_.Lock();
-		--reader_count_;
+		reader_count_ = reader_count_ - 1;
 		if (reader_count_ == 0) {
 			lock_type_ = NO_LOCK;
 		}
