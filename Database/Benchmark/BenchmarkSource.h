@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <TimeMeasurer.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include "BenchmarkScaleParams.h"
 #include "../Redirector/IORedirector.h"
 
@@ -18,17 +18,17 @@ namespace Cavalia{
 		public:
 			BenchmarkSource(const std::string &prefix, IORedirector *redirector, BenchmarkScaleParams *const scale_params, const size_t &num_transactions, const size_t dist_ratio) : redirector_ptr_(redirector), num_transactions_(num_transactions), dist_ratio_(dist_ratio), source_type_(RANDOM_SOURCE), partition_count_(0), partition_id_(0){
 				log_filename_ = prefix + "_" + scale_params->ToString() + "_" + std::to_string(num_transactions) + "_" + std::to_string(dist_ratio) + "_" + std::to_string(source_type_);
-				is_exists_ = boost::filesystem::exists(log_filename_);
+				is_exists_ = std::filesystem::exists(log_filename_);
 			}
 
 			BenchmarkSource(const std::string &prefix, IORedirector *redirector, BenchmarkScaleParams *const scale_params, const size_t &num_transactions, const size_t &dist_ratio, const size_t &partition_count) : redirector_ptr_(redirector), num_transactions_(num_transactions), dist_ratio_(dist_ratio), source_type_(PARTITION_SOURCE), partition_count_(partition_count), partition_id_(0){
 				log_filename_ = prefix + "_" + scale_params->ToString() + "_" + std::to_string(num_transactions) + "_" + std::to_string(dist_ratio) + "_" + std::to_string(source_type_) + "_" + std::to_string(partition_count);
-				is_exists_ = boost::filesystem::exists(log_filename_);
+				is_exists_ = std::filesystem::exists(log_filename_);
 			}
 
 			BenchmarkSource(const std::string &prefix, IORedirector *redirector, BenchmarkScaleParams *const scale_params, const size_t &num_transactions, const size_t &dist_ratio, const size_t &partition_count, const size_t &partition_id) : redirector_ptr_(redirector), num_transactions_(num_transactions), dist_ratio_(dist_ratio), source_type_(SELECT_SOURCE), partition_count_(partition_count), partition_id_(partition_id){
 				log_filename_ = prefix + "_" + scale_params->ToString() + "_" + std::to_string(num_transactions) + "_" + std::to_string(dist_ratio) + "_" + std::to_string(source_type_) + "_" + std::to_string(partition_count) + "_" + std::to_string(partition_id);
-				is_exists_ = boost::filesystem::exists(log_filename_);
+				is_exists_ = std::filesystem::exists(log_filename_);
 			}
 
 			virtual ~BenchmarkSource(){}
@@ -110,7 +110,7 @@ namespace Cavalia{
 				}
 				entry.Release();
 				log_reloader.close();
-			
+
 			}
 
 			virtual TxnParam* DeserializeParam(const size_t &param_type, const CharArray&) = 0;

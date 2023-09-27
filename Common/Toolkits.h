@@ -2,7 +2,7 @@
 #ifndef __COMMON_TOOLKITS_H__
 #define __COMMON_TOOLKITS_H__
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <boost/date_time.hpp>
 #include <string>
 #include <cstdint>
@@ -118,7 +118,7 @@ static int & Str2Int(const std::string &param, int &res){
 }
 
 static std::string GetConfigFilename(std::string &name){
-	boost::filesystem::create_directories("config");
+	std::filesystem::create_directories("config");
 #ifdef _WIN32
 	return "config\\" + name + ".config";
 #elif __linux__
@@ -131,7 +131,7 @@ static std::string GetLogFilename(const std::string &name){
 }
 
 static std::string GetLogFilename(const std::string &folder, const std::string &name){
-	boost::filesystem::create_directories(folder);
+	std::filesystem::create_directories(folder);
 #ifdef _WIN32
 	return folder + "\\" + name + ".log";
 #elif __linux__
@@ -145,7 +145,7 @@ static std::string GetLogFilenameTs(const std::string &prefix){
 }
 
 static std::string GetLogFilenameTs(const std::string &folder, const std::string &prefix){
-	boost::filesystem::create_directories(folder);
+	std::filesystem::create_directories(folder);
 	boost::posix_time::ptime c_time = boost::posix_time::second_clock::local_time();
 #ifdef _WIN32
 	return folder + "\\" + prefix + "_" + boost::posix_time::to_iso_string(c_time) + ".log";
@@ -155,7 +155,7 @@ static std::string GetLogFilenameTs(const std::string &folder, const std::string
 }
 
 static std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &stream_id, const int &version){
-	boost::filesystem::create_directories(folder);
+	std::filesystem::create_directories(folder);
 #ifdef _WIN32
 	return "buffer\\" + Int2Str(operator_id) + "_" + Int2Str(stream_id) + "_" + Int2Str(version) + ".log";
 #elif __linux__
@@ -164,21 +164,21 @@ static std::string GetVersionFilename(const std::string &folder, const int &oper
 }
 
 static std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &stream_id, const int &bucket_id, const int &version){
-	boost::filesystem::create_directories(folder);
+	std::filesystem::create_directories(folder);
 #ifdef _WIN32
 	return "buffer\\" + Int2Str(operator_id) + "_" + Int2Str(stream_id) + "_" + Int2Str(bucket_id) + "_" + Int2Str(version) + ".log";
 #elif __linux__
 	return "buffer/" + Int2Str(operator_id) + "_" + Int2Str(stream_id) + "_" + Int2Str(bucket_id) + "_" + Int2Str(version) + ".log";
-#endif	
+#endif
 }
 
 static std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &version){
-	boost::filesystem::create_directories(folder);
+	std::filesystem::create_directories(folder);
 #ifdef _WIN32
 	return "state\\" + Int2Str(operator_id) + "_" + Int2Str(version) + ".log";
 #elif __linux__
 	return "state/" + Int2Str(operator_id) + "_" + Int2Str(version) + ".log";
-#endif	
+#endif
 }
 
 #endif

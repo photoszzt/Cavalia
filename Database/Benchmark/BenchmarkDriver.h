@@ -6,8 +6,8 @@
 
 #define CHECK_DIRECTORY(BenchmarkName, DirName) \
 	std::string full_name = DirName + "/" + #BenchmarkName;\
-if (boost::filesystem::exists(full_name) == false){ \
-	bool rt = boost::filesystem::create_directory(full_name); \
+if (std::filesystem::exists(full_name) == false){ \
+	bool rt = std::filesystem::create_directory(full_name); \
 	assert(rt == true); \
 }
 
