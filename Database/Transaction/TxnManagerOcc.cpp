@@ -4,6 +4,8 @@
 namespace Cavalia {
 	namespace Database {
 		bool TransactionManager::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record) {
+			(void) context;
+			(void) primary_key;
 			BEGIN_PHASE_MEASURE(thread_id_, INSERT_PHASE);
 			// insert with visibility bit set to false.
 			record->is_visible_ = false;
@@ -27,6 +29,7 @@ namespace Cavalia {
 		}
 
 		bool TransactionManager::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
+			(void) context;
 			if (access_type == READ_ONLY) {
 				Access *access = access_list_.NewAccess();
 				access->access_type_ = READ_ONLY;
@@ -75,6 +78,7 @@ namespace Cavalia {
 		}
 
 		bool TransactionManager::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
+			(void) param;
 			BEGIN_PHASE_MEASURE(thread_id_, COMMIT_PHASE);
 			// step 1: acquire lock and validate
 			size_t lock_count = 0;

@@ -5,6 +5,7 @@
 #include <atomic>
 #include <string>
 #include <cstdio>
+#include <utility>
 #if defined(__linux__)
 #include <unistd.h>
 #endif
@@ -109,7 +110,8 @@ namespace Cavalia{
 				result = fwrite(&buffer_offset_ref, sizeof(size_t), 1, file_ptr);
 				assert(result == 1);
 				result = fwrite(buf_struct_ptr->buffer_ptr_, sizeof(char), buffer_offset_ref, file_ptr);
-				assert(result == buffer_offset_ref);
+				// assert(result == buffer_offset_ref);
+				assert(std::cmp_equal(result, buffer_offset_ref));
 #endif
 				result = fflush(file_ptr);
 				assert(result == 0);

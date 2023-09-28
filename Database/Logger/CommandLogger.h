@@ -2,6 +2,7 @@
 #ifndef __CAVALIA_DATABASE_COMMAND_LOGGER_H__
 #define __CAVALIA_DATABASE_COMMAND_LOGGER_H__
 
+#include <utility>
 #include "BaseLogger.h"
 
 namespace Cavalia {
@@ -16,7 +17,8 @@ namespace Cavalia {
 			virtual void CommitTransaction(const size_t &thread_id, const uint64_t &epoch, const uint64_t &commit_ts, AccessList<kMaxAccessNum> &access_list){
 				ThreadLogBuffer *tlb_ptr = thread_log_buffer_[thread_id];
 				size_t &buffer_offset_ref = tlb_ptr->buffer_offset_;
-				if (tlb_ptr->last_epoch_ == -1){
+				// if (tlb_ptr->last_epoch_ == -1){
+				if (std::cmp_equal(tlb_ptr->last_epoch_, -1)) {
 					tlb_ptr->last_epoch_ = epoch;
 				}
 				else if (tlb_ptr->last_epoch_ != epoch){
@@ -42,7 +44,7 @@ namespace Cavalia {
 					result = fwrite(&buffer_offset_ref, sizeof(size_t), 1, file_ptr);
 					assert(result == 1);
 					result = fwrite(tlb_ptr->buffer_ptr_, sizeof(char), buffer_offset_ref, file_ptr);
-					assert(result == buffer_offset_ref);
+					assert(std::cmp_equal(result, buffer_offset_ref));
 #endif
 					buffer_offset_ref = 0;
 					result = fflush(file_ptr);
@@ -87,7 +89,8 @@ namespace Cavalia {
 						txn_offset += sizeof(uint8_t)+sizeof(size_t)+sizeof(size_t)+key_size;
 					}
 				}
-				size_t txn_size = txn_offset - sizeof(size_t)-sizeof(uint64_t)-sizeof(size_t);
+				// size_t txn_size = txn_offset - sizeof(size_t)-sizeof(uint64_t)-sizeof(size_t);
+				// (void)txn_size;
 				memcpy(curr_buffer_ptr + sizeof(size_t)+sizeof(uint64_t), (char*)(&txn_offset), sizeof(size_t));
 				buffer_offset_ref += sizeof(size_t)+sizeof(uint64_t)+sizeof(size_t)+txn_offset;
 				assert(buffer_offset_ref < kLogBufferSize);
@@ -98,7 +101,8 @@ namespace Cavalia {
 			virtual void CommitTransaction(const size_t &thread_id, const uint64_t &epoch, const uint64_t &commit_ts, const size_t &txn_type, TxnParam *param){
 				ThreadLogBuffer *tlb_ptr = thread_log_buffer_[thread_id];
 				size_t &buffer_offset_ref = tlb_ptr->buffer_offset_;
-				if (tlb_ptr->last_epoch_ == -1){
+				// if (tlb_ptr->last_epoch_ == -1){
+				if (std::cmp_equal(tlb_ptr->last_epoch_, -1)){
 					tlb_ptr->last_epoch_ = epoch;
 				}
 				else if (tlb_ptr->last_epoch_ != epoch){
@@ -124,7 +128,7 @@ namespace Cavalia {
 					result = fwrite(&buffer_offset_ref, sizeof(size_t), 1, file_ptr);
 					assert(result == 1);
 					result = fwrite(tlb_ptr->buffer_ptr_, sizeof(char), buffer_offset_ref, file_ptr);
-					assert(result == buffer_offset_ref);
+					assert(std::cmp_equal(result, buffer_offset_ref));
 #endif
 					buffer_offset_ref = 0;
 					result = fflush(file_ptr);

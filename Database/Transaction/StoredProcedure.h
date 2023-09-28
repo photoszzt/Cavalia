@@ -43,7 +43,12 @@ namespace Cavalia{
 				partition_id_ = partition_id;
 			}
 
-			virtual bool Execute(TxnParam *param, CharArray &ret, const ExeContext &exe_context) { return true; }
+			virtual bool Execute(TxnParam *param, CharArray &ret, const ExeContext &exe_context) {
+				(void) param;
+				(void) ret;
+				(void) exe_context;
+				return true;
+			}
 
 		private:
 			StoredProcedure(const StoredProcedure&);

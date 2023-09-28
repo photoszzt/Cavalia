@@ -16,7 +16,7 @@ namespace Cavalia{
 				char i_data_[64];
 			};
 
-			static std::string ItemToString(ItemRecord &item){
+			[[maybe_unused]] static std::string ItemToString(ItemRecord &item){
 				std::stringstream item_str;
 				item_str << item.i_id_ << ";";
 				item_str << item.i_im_id_ << ";";
@@ -38,7 +38,7 @@ namespace Cavalia{
 				double w_ytd_;
 			};
 
-			static std::string WarehouseToString(WarehouseRecord &warehouse){
+			[[maybe_unused]] static std::string WarehouseToString(WarehouseRecord &warehouse){
 				std::stringstream warehouse_str;
 				warehouse_str << warehouse.w_id_ << ";";
 				warehouse_str << warehouse.w_name_ << ";";
@@ -66,7 +66,7 @@ namespace Cavalia{
 				int d_next_o_id_;
 			};
 
-			static std::string DistrictToString(DistrictRecord &district){
+			[[maybe_unused]] static std::string DistrictToString(DistrictRecord &district){
 				std::stringstream district_str;
 				district_str << district.d_id_ << ";";
 				district_str << district.d_w_id_ << ";";
@@ -106,7 +106,7 @@ namespace Cavalia{
 				char c_data_[500];
 			};
 
-			static std::string CustomerToString(CustomerRecord &customer){
+			[[maybe_unused]] static std::string CustomerToString(CustomerRecord &customer){
 				std::stringstream customer_str;
 				customer_str << customer.c_id_ << ";";
 				customer_str << customer.c_d_id_ << ";";
@@ -143,7 +143,7 @@ namespace Cavalia{
 				int o_all_local_;
 			};
 
-			static std::string OrderToString(OrderRecord &order){
+			[[maybe_unused]] static std::string OrderToString(OrderRecord &order){
 				std::stringstream order_str;
 				order_str << order.o_id_ << ";";
 				order_str << order.o_c_id_ << ";";
@@ -162,7 +162,7 @@ namespace Cavalia{
 				int w_id_;
 			};
 
-			static std::string NewOrderToString(NewOrderRecord &new_order){
+			[[maybe_unused]] static std::string NewOrderToString(NewOrderRecord &new_order){
 				std::stringstream new_order_str;
 				new_order_str << new_order.o_id_ << ";";
 				new_order_str << new_order.d_id_ << ";";
@@ -183,7 +183,7 @@ namespace Cavalia{
 				char ol_dist_info_[32];
 			};
 
-			static std::string OrderLineToString(OrderLineRecord &order_line){
+			[[maybe_unused]] static std::string OrderLineToString(OrderLineRecord &order_line){
 				std::stringstream order_line_str;
 				order_line_str << order_line.ol_o_id_ << ";";
 				order_line_str << order_line.ol_d_id_ << ";";
@@ -209,7 +209,7 @@ namespace Cavalia{
 				char h_data_[32];
 			};
 
-			static std::string HistoryToString(HistoryRecord &history){
+			[[maybe_unused]] static std::string HistoryToString(HistoryRecord &history){
 				std::stringstream history_str;
 				history_str << history.h_c_id_ << ";";
 				history_str << history.h_c_d_id_ << ";";
@@ -233,7 +233,7 @@ namespace Cavalia{
 				char s_data_[64];
 			};
 
-			static std::string StockToString(StockRecord &stock){
+			[[maybe_unused]] static std::string StockToString(StockRecord &stock){
 				std::stringstream stock_str;
 				stock_str << stock.s_i_id_ << ";";
 				stock_str << stock.s_w_id_ << ";";
@@ -254,7 +254,7 @@ namespace Cavalia{
 				int o_id_;
 			};
 
-			static std::string DistrictNewOrderToString(DistrictNewOrderRecord &district_new_order){
+			[[maybe_unused]] static std::string DistrictNewOrderToString(DistrictNewOrderRecord &district_new_order){
 				std::stringstream district_new_order_str;
 				district_new_order_str << district_new_order.w_id_ << ";";
 				district_new_order_str << district_new_order.d_id_ << ";";

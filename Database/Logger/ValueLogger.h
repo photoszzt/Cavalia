@@ -2,6 +2,7 @@
 #ifndef __CAVALIA_DATABASE_VALUE_LOGGER_H__
 #define __CAVALIA_DATABASE_VALUE_LOGGER_H__
 
+#include <utility>
 #include "BaseLogger.h"
 
 namespace Cavalia{
@@ -15,7 +16,7 @@ namespace Cavalia{
 			virtual void CommitTransaction(const size_t &thread_id, const uint64_t &epoch, const uint64_t &commit_ts, AccessList<kMaxAccessNum> &access_list){
 				ThreadLogBuffer *tlb_ptr = thread_log_buffer_[thread_id];
 				size_t &buffer_offset_ref = tlb_ptr->buffer_offset_;
-				if (tlb_ptr->last_epoch_ == -1){
+				if (std::cmp_equal(tlb_ptr->last_epoch_, -1)) {
 					tlb_ptr->last_epoch_ = epoch;
 				}
 				else if (tlb_ptr->last_epoch_ != epoch){
@@ -41,7 +42,7 @@ namespace Cavalia{
 					result = fwrite(&buffer_offset_ref, sizeof(size_t), 1, file_ptr);
 					assert(result == 1);
 					result = fwrite(tlb_ptr->buffer_ptr_, sizeof(char), buffer_offset_ref, file_ptr);
-					assert(result == buffer_offset_ref);
+					assert(std::cmp_equal(result, buffer_offset_ref));
 #endif
 					buffer_offset_ref = 0;
 					result = fflush(file_ptr);
@@ -92,6 +93,11 @@ namespace Cavalia{
 			}
 
 			virtual void CommitTransaction(const size_t &thread_id, const uint64_t &epoch, const uint64_t &commit_ts, const size_t &txn_type, TxnParam *param){
+				(void)thread_id;
+				(void)epoch;
+				(void)commit_ts;
+				(void)txn_type;
+				(void)param;
 				assert(false);
 			}
 

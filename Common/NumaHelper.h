@@ -45,15 +45,16 @@ struct NumaTopology{
 };
 #endif
 
-static size_t GetNumaNodeId(const size_t &core_id){
+static inline size_t GetNumaNodeId(const size_t &core_id){
 #if defined(NUMA)
 	return numa_node_of_cpu(core_id);
 #else
+	(void) core_id;
 	return 0;
 #endif
 }
 
-static size_t GetCoreInNode(const size_t &numa_node_id){
+static inline size_t GetCoreInNode(const size_t &numa_node_id){
 #if defined(NUMA)
 	size_t max_core_count = numa_num_task_cpus();
 	bitmask *bm = numa_allocate_cpumask();
@@ -67,6 +68,7 @@ static size_t GetCoreInNode(const size_t &numa_node_id){
 	assert(false);
 	return -1;
 #else
+	(void)numa_node_id;
 	return 0;
 #endif
 }

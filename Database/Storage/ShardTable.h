@@ -25,7 +25,7 @@ namespace Cavalia {
 					primary_index_ = new BaseUnorderedIndex*[partition_count_];
 #else
 					primary_index_ = new BaseUnorderedIndex*[partition_count_];
-#endif			
+#endif
 					secondary_indexes_ = new BaseOrderedIndex**[partition_count_];
 					for (size_t i = 0; i < partition_count_; ++i){
 						size_t numa_node_id = table_location.Partition2Node(i);
@@ -37,7 +37,7 @@ namespace Cavalia {
 						StdUnorderedIndexMT *p_index = (StdUnorderedIndexMT*)MemAllocator::AllocNode(sizeof(StdUnorderedIndexMT), numa_node_id);
 						new(p_index)StdUnorderedIndexMT();
 						primary_index_[i] = p_index;
-#endif				
+#endif
 						BaseOrderedIndex **s_indexes = (BaseOrderedIndex**)MemAllocator::AllocNode(sizeof(void*)*secondary_count_, numa_node_id);
 						memset(s_indexes, 0, sizeof(void*)*secondary_count_);
 						secondary_indexes_[i] = s_indexes;
@@ -87,7 +87,7 @@ namespace Cavalia {
 			}
 
 			// get the number of records in this table.
-			virtual const size_t GetTableSize() const {
+			virtual size_t GetTableSize() const {
 				size_t size = 0;
 				for (size_t i = 0; i < partition_count_; ++i){
 					size += primary_index_[i]->GetSize();
@@ -161,11 +161,11 @@ namespace Cavalia {
 				}
 				record = secondary_indexes_[part_id][idx_id]->SearchRecord(key);
 			}
-			
+
 			virtual void SelectRecord(const size_t &part_id, const size_t &idx_id, const std::string &key, TableRecord *&record) const {
 				record = secondary_indexes_[part_id][idx_id]->SearchRecord(key);
 			}
-			
+
 			virtual void SelectRecords(const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				size_t part_id = 0;
 				if (partition_count_ != 1){
@@ -173,7 +173,7 @@ namespace Cavalia {
 				}
 				secondary_indexes_[part_id][idx_id]->SearchRecords(key, records);
 			}
-			
+
 			virtual void SelectRecords(const size_t &part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				secondary_indexes_[part_id][idx_id]->SearchRecords(key, records);
 			}
@@ -185,11 +185,11 @@ namespace Cavalia {
 				}
 				secondary_indexes_[part_id][idx_id]->SearchUpperRecords(key, records);
 			}
-			
+
 			virtual void SelectUpperRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				secondary_indexes_[part_id][idx_id]->SearchUpperRecords(key, records);
 			}
-			
+
 			virtual void SelectLowerRecords(const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				size_t part_id = 0;
 				if (partition_count_ != 1){
@@ -197,11 +197,11 @@ namespace Cavalia {
 				}
 				secondary_indexes_[part_id][idx_id]->SearchLowerRecords(key, records);
 			}
-			
+
 			virtual void SelectLowerRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				secondary_indexes_[part_id][idx_id]->SearchLowerRecords(key, records);
 			}
-			
+
 			virtual void SelectRangeRecords(const size_t &idx_id, const std::string &lower_key, std::string &upper_key, TableRecords *records) const {
 				size_t part_id = 0;
 				if (partition_count_ != 1){
@@ -209,7 +209,7 @@ namespace Cavalia {
 				}
 				secondary_indexes_[part_id][idx_id]->SearchRangeRecords(lower_key, upper_key, records);
 			}
-			
+
 			virtual void SelectRangeRecords(const size_t part_id, const size_t &idx_id, const std::string &lower_key, const std::string &upper_key, TableRecords *records) const {
 				secondary_indexes_[part_id][idx_id]->SearchRangeRecords(lower_key, upper_key, records);
 			}

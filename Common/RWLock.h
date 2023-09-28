@@ -2,13 +2,14 @@
 #ifndef __COMMON_RW_LOCK_H__
 #define __COMMON_RW_LOCK_H__
 
+#include <type_traits>
 #include <cassert>
 #include "SpinLock.h"
 
 class RWLock {
 	enum LockType : size_t{ NO_LOCK, READ_LOCK, WRITE_LOCK };
 public:
-	RWLock() : lock_type_(0), reader_count_(0) {}
+	RWLock() : reader_count_(0), lock_type_(0) {}
 
 	void AcquireReadLock() {
 		while (1) {
@@ -105,5 +106,7 @@ private:
 	volatile size_t reader_count_;
 	volatile size_t lock_type_;
 };
+static_assert(std::is_trivial_v<RWLock> == false);
+static_assert(std::is_standard_layout_v<RWLock> == true);
 
 #endif

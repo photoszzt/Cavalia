@@ -9,8 +9,8 @@ namespace Cavalia{
 	namespace Database{
 		class SchemaRecord{
 		public:
-			SchemaRecord() : schema_ptr_(NULL), is_visible_(true), data_ptr_(NULL) {}
-			SchemaRecord(const RecordSchema * const schema_ptr, char *data_ptr) : schema_ptr_(schema_ptr), is_visible_(true), data_ptr_(data_ptr) {}
+			SchemaRecord() : data_ptr_(NULL), schema_ptr_(NULL), is_visible_(true) {}
+			SchemaRecord(const RecordSchema * const schema_ptr, char *data_ptr) : data_ptr_(data_ptr), schema_ptr_(schema_ptr), is_visible_(true) {}
 			~SchemaRecord(){}
 
 			size_t GetTableId() const{

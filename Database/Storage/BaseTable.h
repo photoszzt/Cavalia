@@ -22,7 +22,7 @@ namespace Cavalia{
 			}
 
 			// get the number of records in this table.
-			virtual const size_t GetTableSize() const = 0;
+			virtual size_t GetTableSize() const = 0;
 
 			virtual bool InsertRecord(TableRecord *record) = 0;
 			virtual bool InsertRecord(const std::string &key, TableRecord *record) = 0;
@@ -42,7 +42,7 @@ namespace Cavalia{
 			virtual void SelectLowerRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const = 0;
 			virtual void SelectRangeRecords(const size_t &idx_id, const std::string &lower_key, std::string &upper_key, TableRecords *records) const = 0;
 			virtual void SelectRangeRecords(const size_t part_id, const size_t &idx_id, const std::string &lower_key, const std::string &upper_key, TableRecords *records) const = 0;
-			
+
 			virtual void SaveCheckpoint(std::ofstream &out_stream) = 0;
 			virtual void ReloadCheckpoint(std::ifstream &in_stream) = 0;
 

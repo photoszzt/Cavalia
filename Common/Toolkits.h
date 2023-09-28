@@ -44,23 +44,23 @@ struct TernaryKeyEqual : public std::binary_function<std::tuple<T1, T2, T3>, std
 };
 
 // we assume that str is at least 4 bytes (32 bits) long.
-static uint32_t FastHash(const char *str){
+static inline uint32_t FastHash(const char *str){
 	return *(uint32_t*)(str);
 }
 
-static uint32_t FastHash(const char *str1, const char *str2){
+static inline uint32_t FastHash(const char *str1, const char *str2){
 	return *(uint32_t*)(str1) + *(uint32_t*)(str2);
 }
 
-static uint32_t FastHash(const char *str1, const char *str2, const char *str3){
+static inline uint32_t FastHash(const char *str1, const char *str2, const char *str3){
 	return *(uint32_t*)(str1)+*(uint32_t*)(str2)+*(uint32_t*)(str3);
 }
 
-static uint32_t FastHash(const char *str1, const char *str2, const char *str3, const char *str4){
+static inline uint32_t FastHash(const char *str1, const char *str2, const char *str3, const char *str4){
 	return *(uint32_t*)(str1)+*(uint32_t*)(str2)+*(uint32_t*)(str3)+*(uint32_t*)(str4);
 }
 
-static std::string Int2Str(const int &param){
+static inline std::string Int2Str(const int &param){
 	char tmp[20];
 #ifdef _WIN32
 	sprintf_s(tmp, "%d", param);
@@ -70,7 +70,7 @@ static std::string Int2Str(const int &param){
 	return tmp;
 }
 
-static std::string & Int2Str(const int &param, std::string &str){
+static inline std::string & Int2Str(const int &param, std::string &str){
 	char tmp[20];
 #ifdef _WIN32
 	sprintf_s(tmp, "%d", param);
@@ -81,12 +81,12 @@ static std::string & Int2Str(const int &param, std::string &str){
 	return str;
 }
 
-static std::string PrintCurrentTime(){
+static inline std::string PrintCurrentTime(){
 	boost::posix_time::ptime c_time = boost::posix_time::second_clock::local_time();
 	return boost::posix_time::to_iso_string(c_time);
 }
 
-static std::string Long2Str(const int64_t &param){
+static inline std::string Long2Str(const int64_t &param){
 	char tmp[20];
 #ifdef _WIN32
 	sprintf_s(tmp, "%ld", param);
@@ -96,7 +96,7 @@ static std::string Long2Str(const int64_t &param){
 	return tmp;
 }
 
-static std::string & Long2Str(const int64_t &param, std::string &str){
+static inline std::string & Long2Str(const int64_t &param, std::string &str){
 	char tmp[20];
 #ifdef _WIN32
 	sprintf_s(tmp, "%ld", param);
@@ -107,17 +107,17 @@ static std::string & Long2Str(const int64_t &param, std::string &str){
 	return str;
 }
 
-static int Str2Int(const std::string &param){
+static inline int Str2Int(const std::string &param){
 	int res = atoi(param.c_str());
 	return res;
 }
 
-static int & Str2Int(const std::string &param, int &res){
+static inline int & Str2Int(const std::string &param, int &res){
 	res = atoi(param.c_str());
 	return res;
 }
 
-static std::string GetConfigFilename(std::string &name){
+static inline std::string GetConfigFilename(std::string &name){
 	std::filesystem::create_directories("config");
 #ifdef _WIN32
 	return "config\\" + name + ".config";
@@ -126,11 +126,11 @@ static std::string GetConfigFilename(std::string &name){
 #endif
 }
 
-static std::string GetLogFilename(const std::string &name){
+static inline std::string GetLogFilename(const std::string &name){
 	return name + ".log";
 }
 
-static std::string GetLogFilename(const std::string &folder, const std::string &name){
+static inline std::string GetLogFilename(const std::string &folder, const std::string &name){
 	std::filesystem::create_directories(folder);
 #ifdef _WIN32
 	return folder + "\\" + name + ".log";
@@ -139,12 +139,12 @@ static std::string GetLogFilename(const std::string &folder, const std::string &
 #endif
 }
 
-static std::string GetLogFilenameTs(const std::string &prefix){
+static inline std::string GetLogFilenameTs(const std::string &prefix){
 	boost::posix_time::ptime c_time = boost::posix_time::second_clock::local_time();
 	return prefix + "_" + boost::posix_time::to_iso_string(c_time) + ".log";
 }
 
-static std::string GetLogFilenameTs(const std::string &folder, const std::string &prefix){
+static inline std::string GetLogFilenameTs(const std::string &folder, const std::string &prefix){
 	std::filesystem::create_directories(folder);
 	boost::posix_time::ptime c_time = boost::posix_time::second_clock::local_time();
 #ifdef _WIN32
@@ -154,7 +154,7 @@ static std::string GetLogFilenameTs(const std::string &folder, const std::string
 #endif
 }
 
-static std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &stream_id, const int &version){
+static inline std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &stream_id, const int &version){
 	std::filesystem::create_directories(folder);
 #ifdef _WIN32
 	return "buffer\\" + Int2Str(operator_id) + "_" + Int2Str(stream_id) + "_" + Int2Str(version) + ".log";
@@ -163,7 +163,7 @@ static std::string GetVersionFilename(const std::string &folder, const int &oper
 #endif
 }
 
-static std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &stream_id, const int &bucket_id, const int &version){
+static inline std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &stream_id, const int &bucket_id, const int &version){
 	std::filesystem::create_directories(folder);
 #ifdef _WIN32
 	return "buffer\\" + Int2Str(operator_id) + "_" + Int2Str(stream_id) + "_" + Int2Str(bucket_id) + "_" + Int2Str(version) + ".log";
@@ -172,7 +172,7 @@ static std::string GetVersionFilename(const std::string &folder, const int &oper
 #endif
 }
 
-static std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &version){
+static inline std::string GetVersionFilename(const std::string &folder, const int &operator_id, const int &version){
 	std::filesystem::create_directories(folder);
 #ifdef _WIN32
 	return "state\\" + Int2Str(operator_id) + "_" + Int2Str(version) + ".log";

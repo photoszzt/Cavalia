@@ -23,6 +23,7 @@ public:
 #if defined(NUMA)
 		return (char*)numa_alloc_onnode(size, numa_node_id);
 #else
+		(void)numa_node_id;
 		return (char*)malloc(size);
 #endif
 	}
@@ -31,6 +32,7 @@ public:
 #if defined(NUMA)
 		numa_free(ptr, size);
 #else
+		(void)size;
 		free(ptr);
 #endif
 	}
@@ -47,6 +49,7 @@ public:
 #if defined(NUMA)
 		numa_free(ptr, size);
 #else
+		(void)size;
 		free(ptr);
 #endif
 	}

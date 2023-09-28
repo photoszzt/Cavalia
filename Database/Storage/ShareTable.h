@@ -49,7 +49,7 @@ namespace Cavalia{
 			}
 
 			// get the number of records in this table.
-			virtual const size_t GetTableSize() const {
+			virtual size_t GetTableSize() const {
 				return primary_index_->GetSize();
 			}
 
@@ -81,7 +81,7 @@ namespace Cavalia{
 					return false;
 				}
 			}
-			
+
 			/////////////////////DELETE//////////////////
 			virtual void DeleteRecord(TableRecord *record){
 				SchemaRecord *record_ptr = record->record_;
@@ -108,6 +108,9 @@ namespace Cavalia{
 			}
 
 			virtual void SelectKeyRecord(const size_t &part_id, const std::string &primary_key, TableRecord *&record) const {
+				(void) part_id;
+				(void) primary_key;
+				(void) record;
 				assert(false);
 			}
 
@@ -116,6 +119,10 @@ namespace Cavalia{
 			}
 
 			virtual void SelectRecord(const size_t &part_id, const size_t &idx_id, const std::string &key, TableRecord *&record) const {
+				(void) part_id;
+				(void) idx_id;
+				(void) key;
+				(void) record;
 				assert(false);
 			}
 
@@ -124,6 +131,10 @@ namespace Cavalia{
 			}
 
 			virtual void SelectRecords(const size_t &part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
+				(void) part_id;
+				(void) idx_id;
+				(void) key;
+				(void) records;
 				assert(false);
 			}
 
@@ -132,6 +143,10 @@ namespace Cavalia{
 			}
 
 			virtual void SelectUpperRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
+				(void) part_id;
+				(void) idx_id;
+				(void) key;
+				(void) records;
 				assert(false);
 			}
 
@@ -140,6 +155,10 @@ namespace Cavalia{
 			}
 
 			virtual void SelectLowerRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
+				(void) part_id;
+				(void) idx_id;
+				(void) key;
+				(void) records;
 				assert(false);
 			}
 
@@ -148,6 +167,11 @@ namespace Cavalia{
 			}
 
 			virtual void SelectRangeRecords(const size_t part_id, const size_t &idx_id, const std::string &lower_key, const std::string &upper_key, TableRecords *records) const {
+				(void) part_id;
+				(void) idx_id;
+				(void) lower_key;
+				(void) upper_key;
+				(void) records;
 				assert(false);
 			}
 

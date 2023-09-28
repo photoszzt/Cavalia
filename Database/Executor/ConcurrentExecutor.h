@@ -161,6 +161,7 @@ namespace Cavalia{
 								++backoff_shifts;
 							}
 							uint64_t spins = 1UL << backoff_shifts;
+							(void) spins;
 #if defined(BACKOFF)
 							spins *= 100;
 							while (spins){
@@ -223,7 +224,7 @@ namespace Cavalia{
 				procedures = NULL;*/
 				/////////////////////////////////////////////////
 			}
-			
+
 			size_t GetCoreId(const size_t &thread_id){
 				return thread_id;
 			}
