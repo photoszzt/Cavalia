@@ -2,6 +2,7 @@
 #ifndef __CAVALIA_DATABASE_SCHEMA_RECORDS_H__
 #define __CAVALIA_DATABASE_SCHEMA_RECORDS_H__
 
+#include <type_traits>
 #include "SchemaRecord.h"
 
 namespace Cavalia{
@@ -30,6 +31,7 @@ namespace Cavalia{
 			size_t curr_size_;
 			SchemaRecord **records_;
 		};
+		static_assert(std::is_trivial_v<SchemaRecords> == false && std::is_standard_layout_v<SchemaRecords> == true);
 	}
 }
 

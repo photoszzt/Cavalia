@@ -56,6 +56,7 @@ namespace Cavalia{
 			size_t column_size_;
 			size_t column_offset_;
 		};
+		static_assert(std::is_trivial_v<ColumnInfo> == false && std::is_standard_layout_v<ColumnInfo> == true);
 	}
 }
 

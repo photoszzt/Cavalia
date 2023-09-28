@@ -30,6 +30,8 @@ namespace Cavalia{
 			size_t curr_size_;
 			TableRecord **records_;
 		};
+		static_assert(std::is_trivial_v<TableRecords> == false);
+		static_assert(std::is_standard_layout_v<TableRecords> == true);
 	}
 }
 

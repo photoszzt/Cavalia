@@ -2,6 +2,7 @@
 #ifndef __CAVALIA_DATABASE_TABLE_RECORD_H__
 #define __CAVALIA_DATABASE_TABLE_RECORD_H__
 
+#include <type_traits>
 #include "SchemaRecord.h"
 
 #if defined(LOCK_WAIT)
@@ -45,7 +46,7 @@ namespace Cavalia{
 			TableRecord(SchemaRecord *record) : record_(record) {}
 #endif
 			~TableRecord(){}
-			
+
 			SchemaRecord *record_;
 
 #if defined(LOCK_WAIT)
@@ -74,6 +75,8 @@ namespace Cavalia{
 			LockRtmContent content_;
 #endif
 		};
+		static_assert(std::is_trivial_v<TableRecord> == false);
+		static_assert(std::is_standard_layout_v<TableRecord> == true);
 	}
 }
 

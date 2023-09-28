@@ -2,6 +2,7 @@
 #ifndef __CAVALIA_DATABASE_ISLAND_TABLE_H__
 #define __CAVALIA_DATABASE_ISLAND_TABLE_H__
 
+#include <type_traits>
 #include <NumaHelper.h>
 #include <ThreadHelper.h>
 #include "BaseTable.h"
@@ -25,7 +26,7 @@ namespace Cavalia {
 					primary_index_ = new BaseUnorderedIndex*[partition_count_];
 #else
 					primary_index_ = new BaseUnorderedIndex*[partition_count_];
-#endif			
+#endif
 					secondary_indexes_ = new BaseOrderedIndex**[partition_count_];
 					for (size_t i = 0; i < partition_count_; ++i){
 						size_t numa_node_id = table_location.Partition2Node(i);
@@ -37,7 +38,7 @@ namespace Cavalia {
 						StdUnorderedIndexMT *p_index = (StdUnorderedIndexMT*)MemAllocator::AllocNode(sizeof(StdUnorderedIndexMT), numa_node_id);
 						new(p_index)StdUnorderedIndexMT();
 						primary_index_[i] = p_index;
-#endif				
+#endif
 						BaseOrderedIndex **s_indexes = (BaseOrderedIndex**)MemAllocator::AllocNode(sizeof(void*)*secondary_count_, numa_node_id);
 						memset(s_indexes, 0, sizeof(void*)*secondary_count_);
 						secondary_indexes_[i] = s_indexes;
@@ -87,7 +88,7 @@ namespace Cavalia {
 			}
 
 			// get the number of records in this table.
-			virtual const size_t GetTableSize() const {
+			virtual size_t GetTableSize() const {
 				size_t size = 0;
 				for (size_t i = 0; i < partition_count_; ++i){
 					size += primary_index_[i]->GetSize();
@@ -288,6 +289,7 @@ namespace Cavalia {
 			BaseUnorderedIndex **primary_index_;
 			BaseOrderedIndex ***secondary_indexes_;
 		};
+		static_assert(std::is_trivial_v<IslandTable> == false && std::is_standard_layout_v<IslandTable> == false);
 	}
 }
 

@@ -252,6 +252,7 @@ namespace Cavalia{
 			std::unordered_map<std::string, size_t> secondary_symbols_;
 			size_t secondary_num_;
 		};
+		static_assert(std::is_trivial_v<RecordSchema> == false && std::is_standard_layout_v<RecordSchema> == true);
 	}
 }
 

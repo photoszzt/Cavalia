@@ -2,6 +2,7 @@
 #ifndef __COMMON_CHAR_ARRAY_H__
 #define __COMMON_CHAR_ARRAY_H__
 
+#include <type_traits>
 #include <cstring>
 #include <cstdint>
 
@@ -52,5 +53,7 @@ struct CharArray{
 		memset(char_ptr_, 0, size_);
 	}
 };
+static_assert(std::is_trivial_v<CharArray> == false && std::is_standard_layout_v<CharArray> == true);
+
 
 #endif

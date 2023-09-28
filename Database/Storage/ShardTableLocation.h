@@ -2,6 +2,8 @@
 #ifndef __CAVALIA_DATABASE_EXECUTOR_SHARD_TABLE_LOCATION_H__
 #define __CAVALIA_DATABASE_EXECUTOR_SHARD_TABLE_LOCATION_H__
 
+#include <type_traits>
+#include <stddef.h>
 #include <vector>
 
 namespace Cavalia{
@@ -19,9 +21,11 @@ namespace Cavalia{
 				node_ids_.push_back(node_id);
 			}
 
-		private:
+		// private:
 			std::vector<size_t> node_ids_;
 		};
+		static_assert(std::is_trivial_v<ShardTableLocation> == false);
+		static_assert(std::is_standard_layout_v<ShardTableLocation> == true);
 	}
 }
 

@@ -2,6 +2,7 @@
 #ifndef __CAVALIA_DATABASE_SHARD_TABLE_H__
 #define __CAVALIA_DATABASE_SHARD_TABLE_H__
 
+#include <type_traits>
 #include <NumaHelper.h>
 #include <ThreadHelper.h>
 #include "BaseTable.h"
@@ -16,7 +17,7 @@
 
 namespace Cavalia {
 	namespace Database {
-		class ShardTable : public BaseTable {
+		class ShardTable final: public BaseTable {
 		public:
 			ShardTable(const RecordSchema * const schema_ptr, const ShardTableLocation &table_location, bool is_thread_safe) : BaseTable(schema_ptr), partition_count_(table_location.GetPartitionCount()){
 				table_location_ = table_location;
@@ -289,6 +290,8 @@ namespace Cavalia {
 			BaseUnorderedIndex **primary_index_;
 			BaseOrderedIndex ***secondary_indexes_;
 		};
+		static_assert(std::is_trivial_v<ShardTable> == false);
+		static_assert(std::is_standard_layout_v<ShardTable> == false);
 	}
 }
 

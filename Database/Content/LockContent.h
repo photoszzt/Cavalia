@@ -2,6 +2,7 @@
 #ifndef __CAVALIA_DATABASE_LOCK_CONTENT_H__
 #define __CAVALIA_DATABASE_LOCK_CONTENT_H__
 
+#include <type_traits>
 #include <atomic>
 #include <RWLock.h>
 
@@ -52,6 +53,8 @@ namespace Cavalia {
 			std::atomic<uint64_t> timestamp_;
 			RWLock lock_;
 		};
+		static_assert(std::is_trivial_v<LockContent> == false);
+		static_assert(std::is_standard_layout_v<LockContent> == true);
 	}
 }
 

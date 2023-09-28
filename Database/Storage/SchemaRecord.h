@@ -149,6 +149,7 @@ namespace Cavalia{
 			const RecordSchema *schema_ptr_;
 			bool is_visible_;
 		};
+		static_assert(std::is_trivial_v<SchemaRecord> == false && std::is_standard_layout_v<SchemaRecord> == true);
 	}
 }
 
