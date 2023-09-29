@@ -11,9 +11,11 @@
 namespace Cavalia{
 	namespace Benchmark{
 		namespace Smallbank{
-			class SmallbankPopulator : public BenchmarkPopulator{
+			template<typename Table> requires IsTable<Table>
+			class SmallbankPopulator : public BenchmarkPopulator<Table>{
 			public:
-				SmallbankPopulator(const SmallbankScaleParams *params, BaseStorageManager *storage_manager) : BenchmarkPopulator(storage_manager), num_accounts_(static_cast<int>(params->scalefactor_*NUM_ACCOUNTS)){}
+				using BenchmarkPopulator<Table>::storage_manager_;
+				SmallbankPopulator(const SmallbankScaleParams *params, BaseStorageManager<Table> *storage_manager) : BenchmarkPopulator<Table>(storage_manager), num_accounts_(static_cast<int>(params->scalefactor_*NUM_ACCOUNTS)){}
 
 				virtual ~SmallbankPopulator(){}
 
@@ -41,5 +43,7 @@ namespace Cavalia{
 		}
 	}
 }
+
+#include "SmallbankPopulator.tpp"
 
 #endif

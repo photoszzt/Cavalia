@@ -9,9 +9,12 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Smallbank{
 			namespace ShardProcedures{
-				class BalanceShardProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class BalanceShardProcedure : public StoredProcedure<Table>{
 				public:
-					BalanceShardProcedure(const size_t &txn_type) : StoredProcedure(txn_type){
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+					BalanceShardProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){
 						context_.is_read_only_ = true;
 					}
 					virtual ~BalanceShardProcedure(){}

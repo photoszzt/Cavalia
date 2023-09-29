@@ -1,10 +1,15 @@
 #if defined(LOCK)
+#pragma once
+#ifndef TXN_MANAGER_LOCK_TPP_
+#define TXN_MANAGER_LOCK_TPP_
+
 #include <iostream>
 #include "TransactionManager.h"
 
 namespace Cavalia{
 	namespace Database{
-		bool TransactionManager::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record){
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record){
 			BEGIN_PHASE_MEASURE(thread_id_, INSERT_PHASE);
 			record->is_visible_ = false;
 			TableRecord *tb_record = new TableRecord(record);
@@ -29,7 +34,8 @@ namespace Cavalia{
 			}*/
 		}
 
-		bool TransactionManager::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
 			s_record = t_record->record_;
 			if (access_type == READ_ONLY) {
 				// if cannot get lock, then return immediately.
@@ -89,7 +95,8 @@ namespace Cavalia{
 			}
 		}
 
-		bool TransactionManager::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
 			BEGIN_PHASE_MEASURE(thread_id_, COMMIT_PHASE);
 #if defined(SCALABLE_TIMESTAMP)
 			uint64_t max_rw_ts = 0;
@@ -159,7 +166,8 @@ namespace Cavalia{
 			return true;
 		}
 
-		void TransactionManager::AbortTransaction() {
+		template <typename Table> requires IsTable<Table>
+		void TransactionManager<Table>::AbortTransaction() {
 			// recover updated data and release locks.
 			for (size_t i = 0; i < access_list_.access_count_; ++i){
 				Access *access_ptr = access_list_.GetAccess(i);
@@ -191,4 +199,6 @@ namespace Cavalia{
 	}
 }
 
-#endif
+#endif // TXN_MANAGER_LOCK_TPP_
+
+#endif // LOCK

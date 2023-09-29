@@ -20,9 +20,10 @@
 namespace Cavalia{
 	namespace Database{
 
+		template <typename Table> requires IsTable<Table>
 		class ConcurrentExecutor : public BaseExecutor{
 		public:
-			ConcurrentExecutor(IORedirector *const redirector, BaseStorageManager *const storage_manager, BaseLogger *const logger, const size_t &thread_count) : BaseExecutor(redirector, logger, thread_count), storage_manager_(storage_manager){
+			ConcurrentExecutor(IORedirector *const redirector, BaseStorageManager<Table> *const storage_manager, BaseLogger *const logger, const size_t &thread_count) : BaseExecutor(redirector, logger, thread_count), storage_manager_(storage_manager){
 				is_begin_ = false;
 				is_finish_ = false;
 				total_count_ = 0;
@@ -113,11 +114,11 @@ namespace Cavalia{
 				/////////////////////////////////////////////////
 				// prepare local managers.
 				size_t node_id = GetNumaNodeId(core_id);
-				TransactionManager *txn_manager = new TransactionManager(storage_manager_, logger_, thread_id, this->thread_count_);
+				TransactionManager<Table> *txn_manager = new TransactionManager(storage_manager_, logger_, thread_id, this->thread_count_);
 #if defined(DBX) || defined(RTM) || defined(OCC_RTM) || defined(LOCK_RTM)
 				txn_manager->SetRtmLock(&rtm_lock_);
 #endif
-				StoredProcedure **procedures = new StoredProcedure*[registers_.size()];
+				StoredProcedure<Table> **procedures = new StoredProcedure<Table>*[registers_.size()];
 				for (auto &entry : registers_){
 					procedures[entry.first] = entry.second(node_id);
 					procedures[entry.first]->SetTransactionManager(txn_manager);
@@ -234,11 +235,11 @@ namespace Cavalia{
 			ConcurrentExecutor& operator=(const ConcurrentExecutor &);
 
 		protected:
-			std::unordered_map<size_t, std::function<StoredProcedure*(size_t)>> registers_;
+			std::unordered_map<size_t, std::function<StoredProcedure<Table>*(size_t)>> registers_;
 			std::unordered_map<size_t, std::function<void(char*)>> deregisters_;
 
 		private:
-			BaseStorageManager *const storage_manager_;
+			BaseStorageManager<Table> *const storage_manager_;
 			TimeMeasurer timer_;
 			system_clock::time_point start_timestamp_;
 			system_clock::time_point end_timestamp_;

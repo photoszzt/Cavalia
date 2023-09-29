@@ -7,9 +7,10 @@
 
 namespace Cavalia{
 	namespace Database{
+		template <typename Table> requires IsTable<Table>
 		class SerialCommandReplayer : public BaseCommandReplayer{
 		public:
-			SerialCommandReplayer(const std::string &filename, BaseStorageManager *const storage_manager, const size_t &thread_count) : BaseCommandReplayer(filename, storage_manager, thread_count){}
+			SerialCommandReplayer(const std::string &filename, BaseStorageManager<Table> *const storage_manager, const size_t &thread_count) : BaseCommandReplayer(filename, storage_manager, thread_count){}
 			virtual ~SerialCommandReplayer(){}
 
 		private:

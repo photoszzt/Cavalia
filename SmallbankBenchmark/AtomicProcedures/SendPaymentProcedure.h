@@ -9,9 +9,12 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Smallbank{
 			namespace AtomicProcedures{
-				class SendPaymentProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class SendPaymentProcedure : public StoredProcedure<Table>{
 				public:
-					SendPaymentProcedure(const size_t &txn_type) : StoredProcedure(txn_type){}
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+					SendPaymentProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){}
 					virtual ~SendPaymentProcedure(){}
 
 					virtual bool Execute(TxnParam *param, CharArray &ret, const ExeContext &exe_context){
@@ -37,7 +40,7 @@ namespace Cavalia{
 						float destacct_final_checking = *(float*)(destacct_checking_record->GetColumn(1)) + sp_param->amount_;
 						sendacct_checking_record->UpdateColumn(1, (char*)(&sendacct_final_checking));
 						destacct_checking_record->UpdateColumn(1, (char*)(&destacct_final_checking));
-						
+
 						ret.Memcpy(ret.size_, (char*)(&sp_param->custid_0_), sizeof(sp_param->custid_0_));
 						ret.size_ += sizeof(sp_param->custid_0_);
 						ret.Memcpy(ret.size_, (char*)(&sp_param->custid_1_), sizeof(sp_param->custid_1_));

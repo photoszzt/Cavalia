@@ -9,9 +9,12 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Smallbank{
 			namespace AtomicProcedures{
-				class TransactSavingsProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class TransactSavingsProcedure : public StoredProcedure<Table>{
 				public:
-					TransactSavingsProcedure(const size_t &txn_type) : StoredProcedure(txn_type){}
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+					TransactSavingsProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){}
 					virtual ~TransactSavingsProcedure(){}
 
 					virtual bool Execute(TxnParam *param, CharArray &ret, const ExeContext &exe_context){
@@ -29,7 +32,7 @@ namespace Cavalia{
 						//}
 						float final_savings = cur_savings - ts_param->amount_;
 						savings_record->UpdateColumn(1, (char*)(&final_savings));
-						
+
 						ret.Memcpy(ret.size_, (char*)(&ts_param->custid_), sizeof(ts_param->custid_));
 						ret.size_ += sizeof(ts_param->custid_);
 						ret.Memcpy(ret.size_, (char*)(&final_savings), sizeof(final_savings));

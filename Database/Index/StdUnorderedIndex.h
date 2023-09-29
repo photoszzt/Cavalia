@@ -3,22 +3,23 @@
 #define __CAVALIA_DATABASE_STD_UNORDERED_INDEX_H__
 
 #include <unordered_map>
+#include "ClassHelper.h"
 #include "BaseUnorderedIndex.h"
 
 namespace Cavalia {
 	namespace Database {
-		class StdUnorderedIndex : public BaseUnorderedIndex {
+		class StdUnorderedIndex {
 		public:
 			StdUnorderedIndex() {}
-			virtual ~StdUnorderedIndex() {
+			~StdUnorderedIndex() {
 				// all the records in the table should be deleted by primary index.
-				// that is, primary index takes the owership of the data. 
+				// that is, primary index takes the owership of the data.
 				// at current stage, we do not deconstruct entries.
 				// tables will only be deleted when the program exits.
 				// that is, we rely on the OS to reclaim memory.
 			}
 
-			virtual bool InsertRecord(const std::string &key, TableRecord *record) {
+			bool InsertRecord(const std::string &key, TableRecord *record) {
 				if (hash_index_.find(key) == hash_index_.end()){
 					hash_index_[key] = record;
 					return true;
@@ -28,7 +29,7 @@ namespace Cavalia {
 				}
 			}
 
-			virtual bool DeleteRecord(const std::string &key) {
+			bool DeleteRecord(const std::string &key) {
 				if (hash_index_.find(key) == hash_index_.end()){
 					return false;
 				}
@@ -38,7 +39,7 @@ namespace Cavalia {
 				}
 			}
 
-			virtual TableRecord* SearchRecord(const std::string &key) {
+			TableRecord* SearchRecord(const std::string &key) {
 				if (hash_index_.find(key) == hash_index_.end()) {
 					return NULL;
 				}
@@ -47,24 +48,27 @@ namespace Cavalia {
 				}
 			}
 
-			virtual size_t GetSize() const {
+			size_t GetSize() const {
 				return hash_index_.size();
 			}
 
-			virtual void SaveCheckpoint(std::ofstream &out_stream, const size_t &record_size) {
+			void SaveCheckpoint(std::ofstream &out_stream, const size_t &record_size) {
 				for (auto &entry : hash_index_){
 					out_stream.write(entry.second->record_->data_ptr_, record_size);
 				}
 				out_stream.flush();
 			}
 
-		private:
-			StdUnorderedIndex(const StdUnorderedIndex &);
-			StdUnorderedIndex& operator=(const StdUnorderedIndex &);
+		// private:
+			StdUnorderedIndex(const StdUnorderedIndex &) = delete;
+			StdUnorderedIndex& operator=(const StdUnorderedIndex &) = delete;
 
-		protected:
+		// protected:
 			std::unordered_map<std::string, TableRecord*> hash_index_;
 		};
+		static_assert(IsUnorderedIndex<StdUnorderedIndex>, "");
+		CHECK_STD_LAYOUT(StdUnorderedIndex, true);
+		CHECK_TRIVIAL(StdUnorderedIndex, false);
 	}
 }
 

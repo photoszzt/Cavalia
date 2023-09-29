@@ -9,9 +9,12 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Smallbank{
 			namespace AtomicProcedures{
-				class DepositCheckingProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class DepositCheckingProcedure : public StoredProcedure<Table>{
 				public:
-					DepositCheckingProcedure(const size_t &txn_type) : StoredProcedure(txn_type){}
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+					DepositCheckingProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){}
 					virtual ~DepositCheckingProcedure(){}
 
 					virtual bool Execute(TxnParam *param, CharArray &ret, const ExeContext &exe_context){

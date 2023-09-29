@@ -3,7 +3,8 @@
 
 namespace Cavalia{
 	namespace Database{
-		bool TransactionManager::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record){
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record){
 			BEGIN_PHASE_MEASURE(thread_id_, INSERT_PHASE);
 			if (is_first_access_ == true){
 				BEGIN_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
@@ -32,7 +33,8 @@ namespace Cavalia{
 			return true;
 		}
 
-		bool TransactionManager::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
 			if (context->is_read_only_ == true){
 				if (is_first_access_ == true){
 					BEGIN_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
@@ -117,7 +119,8 @@ namespace Cavalia{
 			}
 		}
 
-		bool TransactionManager::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
 			BEGIN_PHASE_MEASURE(thread_id_, COMMIT_PHASE);
 			if (context->is_read_only_ == true){
 				for (auto &entry : read_only_set_){
@@ -156,7 +159,8 @@ namespace Cavalia{
 			return true;
 		}
 
-		void TransactionManager::AbortTransaction() {
+		template <typename Table> requires IsTable<Table>
+		void TransactionManager<Table>::AbortTransaction() {
 			for (size_t i = 0; i < access_list_.access_count_; ++i){
 				Access *access_ptr = access_list_.GetAccess(i);
 				// not insert

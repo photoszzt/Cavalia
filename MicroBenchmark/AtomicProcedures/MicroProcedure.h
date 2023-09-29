@@ -9,9 +9,12 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Micro{
 			namespace AtomicProcedures{
-				class MicroProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class MicroProcedure : public StoredProcedure<Table>{
 				public:
-					MicroProcedure(const size_t &txn_type) : StoredProcedure(txn_type){}
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+					MicroProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){}
 					virtual ~MicroProcedure(){}
 
 					virtual bool Execute(TxnParam *param, CharArray &ret, const ExeContext &exe_context){

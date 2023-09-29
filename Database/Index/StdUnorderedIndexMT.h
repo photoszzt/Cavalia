@@ -3,16 +3,17 @@
 #define __CAVALIA_DATABASE_STD_UNORDERED_INDEX_MT_H__
 
 #include <RWLock.h>
+#include <ClassHelper.h>
 #include "StdUnorderedIndex.h"
 
 namespace Cavalia {
 	namespace Database {
-		class StdUnorderedIndexMT : public StdUnorderedIndex {
+		class StdUnorderedIndexMT {
 		public:
 			StdUnorderedIndexMT() {}
-			virtual ~StdUnorderedIndexMT() {}
+			~StdUnorderedIndexMT() {}
 
-			virtual bool InsertRecord(const std::string &key, TableRecord *record) {
+			bool InsertRecord(const std::string &key, TableRecord *record) {
 				lock_.AcquireWriteLock();
 				if (hash_index_.find(key) == hash_index_.end()){
 					hash_index_[key] = record;
@@ -25,7 +26,7 @@ namespace Cavalia {
 				}
 			}
 
-			virtual bool DeleteRecord(const std::string &key) {
+			bool DeleteRecord(const std::string &key) {
 				lock_.AcquireWriteLock();
 				if (hash_index_.find(key) == hash_index_.end()){
 					lock_.ReleaseWriteLock();
@@ -38,7 +39,7 @@ namespace Cavalia {
 				}
 			}
 
-			virtual TableRecord* SearchRecord(const std::string &key) {
+			TableRecord* SearchRecord(const std::string &key) {
 				lock_.AcquireReadLock();
 				if (hash_index_.find(key) == hash_index_.end()) {
 					lock_.ReleaseReadLock();
@@ -51,13 +52,25 @@ namespace Cavalia {
 				}
 			}
 
-		private:
-			StdUnorderedIndexMT(const StdUnorderedIndexMT &);
-			StdUnorderedIndexMT& operator=(const StdUnorderedIndexMT &);
+			size_t GetSize() const {
+				return hash_index_.size();
+			}
 
-		protected:
+			void SaveCheckpoint(std::ofstream &out_stream, const size_t &record_size) {
+				for (auto &entry : hash_index_){
+					out_stream.write(entry.second->record_->data_ptr_, record_size);
+				}
+				out_stream.flush();
+			}
+
+			DISALLOW_COPY_AND_ASSIGN(StdUnorderedIndexMT);
+		// protected:
 			RWLock lock_;
+			std::unordered_map<std::string, TableRecord*> hash_index_;
 		};
+		static_assert(IsUnorderedIndex<StdUnorderedIndexMT>, "");
+		CHECK_STD_LAYOUT(StdUnorderedIndexMT, true);
+		CHECK_TRIVIAL(StdUnorderedIndexMT, false);
 	}
 }
 

@@ -8,12 +8,13 @@
 namespace Cavalia{
 	namespace Benchmark{
 		namespace Tpcc{
-			class TpccTableInitiator : public BenchmarkTableInitiator{
+			template <typename Table> requires IsTable<Table>
+			class TpccTableInitiator : public BenchmarkTableInitiator<Table>{
 			public:
 				TpccTableInitiator(){}
 				virtual ~TpccTableInitiator(){}
 
-				virtual void Initialize(BaseStorageManager *storage_manager){
+				virtual void Initialize(BaseStorageManager<Table> *storage_manager){
 					std::unordered_map<size_t, RecordSchema*> schemas;
 					schemas[ITEM_TABLE_ID] = TpccSchema::GenerateItemSchema();
 					schemas[WAREHOUSE_TABLE_ID] = TpccSchema::GenerateWarehouseSchema();

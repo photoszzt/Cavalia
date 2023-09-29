@@ -1,13 +1,18 @@
-#include "TpccPopulator.h"
+#pragma once
+#ifndef __CAVALIA_TPCC_BENCHMARK_TPCC_POPULATOR_TPP__
+#define __CAVALIA_TPCC_BENCHMARK_TPCC_POPULATOR_TPP__
 
+#include "TpccPopulator.h"
 namespace Cavalia{
 	namespace Benchmark{
 		namespace Tpcc{
-			void TpccPopulator::StartPopulate(){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::StartPopulate(){
 				StartPopulate(1, scale_params_->num_warehouses_);
 			}
-			
-			void TpccPopulator::StartPopulate(const size_t &min_w_id, const size_t &max_w_id){
+
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::StartPopulate(const size_t &min_w_id, const size_t &max_w_id){
 				// load items
 				std::unordered_set<int> original_rows;
 				TpccRandomGenerator::SelectUniqueIds(scale_params_->num_items_ / 10, 1, scale_params_->num_items_, original_rows);
@@ -99,7 +104,8 @@ namespace Cavalia{
 				}
 			}
 
-			ItemRecord* TpccPopulator::GenerateItemRecord(const int &item_id, bool original) const{
+			template <typename Table> requires IsTable<Table>
+			ItemRecord* TpccPopulator<Table>::GenerateItemRecord(const int &item_id, bool original) const{
 				ItemRecord *record = new ItemRecord();
 				record->i_id_ = item_id;
 				record->i_im_id_ = TpccRandomGenerator::GenerateInteger(MIN_IM, MAX_IM);
@@ -111,7 +117,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			WarehouseRecord* TpccPopulator::GenerateWarehouseRecord(const int &w_id) const{
+			template <typename Table> requires IsTable<Table>
+			WarehouseRecord* TpccPopulator<Table>::GenerateWarehouseRecord(const int &w_id) const{
 				WarehouseRecord *record = new WarehouseRecord();
 				record->w_id_ = w_id;
 				std::string name = TpccRandomGenerator::GenerateAString(MIN_NAME, MAX_NAME);
@@ -122,7 +129,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			DistrictRecord* TpccPopulator::GenerateDistrictRecord(const int &d_w_id, const int &d_id, const int &d_next_o_id) const{
+			template <typename Table> requires IsTable<Table>
+			DistrictRecord* TpccPopulator<Table>::GenerateDistrictRecord(const int &d_w_id, const int &d_id, const int &d_next_o_id) const{
 				DistrictRecord *record = new DistrictRecord();
 				record->d_id_ = d_id;
 				record->d_w_id_ = d_w_id;
@@ -135,7 +143,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			CustomerRecord* TpccPopulator::GenerateCustomerRecord(const int &c_w_id, const int &c_d_id, const int &c_id, bool bad_credit) const{
+			template <typename Table> requires IsTable<Table>
+			CustomerRecord* TpccPopulator<Table>::GenerateCustomerRecord(const int &c_w_id, const int &c_d_id, const int &c_id, bool bad_credit) const{
 				CustomerRecord *record = new CustomerRecord();
 				record->c_id_ = c_id;
 				record->c_d_id_ = c_d_id;
@@ -172,7 +181,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			StockRecord* TpccPopulator::GenerateStockRecord(const int &s_w_id, const int &s_i_id, bool original) const{
+			template <typename Table> requires IsTable<Table>
+			StockRecord* TpccPopulator<Table>::GenerateStockRecord(const int &s_w_id, const int &s_i_id, bool original) const{
 				StockRecord *record = new StockRecord();
 				record->s_i_id_ = s_i_id;
 				record->s_w_id_ = s_w_id;
@@ -193,7 +203,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			OrderRecord* TpccPopulator::GenerateOrderRecord(const int &o_w_id, const int &o_d_id, const int &o_id, const int &o_c_id, const int &o_ol_cnt, bool new_order) const{
+			template <typename Table> requires IsTable<Table>
+			OrderRecord* TpccPopulator<Table>::GenerateOrderRecord(const int &o_w_id, const int &o_d_id, const int &o_id, const int &o_c_id, const int &o_ol_cnt, bool new_order) const{
 				OrderRecord *record = new OrderRecord();
 				record->o_id_ = o_id;
 				record->o_c_id_ = o_c_id;
@@ -211,7 +222,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			NewOrderRecord* TpccPopulator::GenerateNewOrderRecord(const int &w_id, const int &d_id, const int &o_id) const{
+			template <typename Table> requires IsTable<Table>
+			NewOrderRecord* TpccPopulator<Table>::GenerateNewOrderRecord(const int &w_id, const int &d_id, const int &o_id) const{
 				NewOrderRecord *record = new NewOrderRecord();
 				record->w_id_ = w_id;
 				record->d_id_ = d_id;
@@ -219,7 +231,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			OrderLineRecord* TpccPopulator::GenerateOrderLineRecord(const int &ol_w_id, const int &ol_d_id, const int &ol_o_id, const int &ol_number, const int &max_items, bool new_order) const{
+			template <typename Table> requires IsTable<Table>
+			OrderLineRecord* TpccPopulator<Table>::GenerateOrderLineRecord(const int &ol_w_id, const int &ol_d_id, const int &ol_o_id, const int &ol_number, const int &max_items, bool new_order) const{
 				OrderLineRecord *record = new OrderLineRecord();
 				record->ol_o_id_ = ol_o_id;
 				record->ol_d_id_ = ol_d_id;
@@ -241,7 +254,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			HistoryRecord* TpccPopulator::GenerateHistoryRecord(const int &h_c_w_id, const int &h_c_d_id, const int &h_c_id) const{
+			template <typename Table> requires IsTable<Table>
+			HistoryRecord* TpccPopulator<Table>::GenerateHistoryRecord(const int &h_c_w_id, const int &h_c_d_id, const int &h_c_id) const{
 				HistoryRecord *record = new HistoryRecord();
 				record->h_c_id_ = h_c_id;
 				record->h_c_d_id_ = h_c_d_id;
@@ -255,7 +269,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			DistrictNewOrderRecord* TpccPopulator::GenerateDistrictNewOrderRecord(const int &w_id, const int &d_id, const int &o_id) const{
+			template <typename Table> requires IsTable<Table>
+			DistrictNewOrderRecord* TpccPopulator<Table>::GenerateDistrictNewOrderRecord(const int &w_id, const int &d_id, const int &o_id) const{
 				DistrictNewOrderRecord *record = new DistrictNewOrderRecord();
 				record->w_id_ = w_id;
 				record->d_id_ = d_id;
@@ -263,7 +278,8 @@ namespace Cavalia{
 				return record;
 			}
 
-			void TpccPopulator::InsertItemRecord(const ItemRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertItemRecord(const ItemRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateItemSchema()->GetSchemaSize()];
 				SchemaRecord *item_record = new SchemaRecord(TpccSchema::GenerateItemSchema(), data);
 				item_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->i_id_));
@@ -274,7 +290,8 @@ namespace Cavalia{
 				storage_manager_->tables_[ITEM_TABLE_ID]->InsertRecord(new TableRecord(item_record));
 			}
 
-			void TpccPopulator::InsertWarehouseRecord(const WarehouseRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertWarehouseRecord(const WarehouseRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateWarehouseSchema()->GetSchemaSize()];
 				SchemaRecord *warehouse_record = new SchemaRecord(TpccSchema::GenerateWarehouseSchema(), data);
 				warehouse_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->w_id_));
@@ -289,7 +306,8 @@ namespace Cavalia{
 				storage_manager_->tables_[WAREHOUSE_TABLE_ID]->InsertRecord(new TableRecord(warehouse_record));
 			}
 
-			void TpccPopulator::InsertDistrictRecord(const DistrictRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertDistrictRecord(const DistrictRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateDistrictSchema()->GetSchemaSize()];
 				SchemaRecord *district_record = new SchemaRecord(TpccSchema::GenerateDistrictSchema(), data);
 				district_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->d_id_));
@@ -306,7 +324,8 @@ namespace Cavalia{
 				storage_manager_->tables_[DISTRICT_TABLE_ID]->InsertRecord(new TableRecord(district_record));
 			}
 
-			void TpccPopulator::InsertCustomerRecord(const CustomerRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertCustomerRecord(const CustomerRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateCustomerSchema()->GetSchemaSize()];
 				SchemaRecord *customer_record = new SchemaRecord(TpccSchema::GenerateCustomerSchema(), data);
 				customer_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->c_id_));
@@ -333,7 +352,8 @@ namespace Cavalia{
 				storage_manager_->tables_[CUSTOMER_TABLE_ID]->InsertRecord(new TableRecord(customer_record));
 			}
 
-			void TpccPopulator::InsertStockRecord(const StockRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertStockRecord(const StockRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateStockSchema()->GetSchemaSize()];
 				SchemaRecord *stock_record = new SchemaRecord(TpccSchema::GenerateStockSchema(), data);
 				stock_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->s_i_id_));
@@ -349,7 +369,8 @@ namespace Cavalia{
 				storage_manager_->tables_[STOCK_TABLE_ID]->InsertRecord(new TableRecord(stock_record));
 			}
 
-			void TpccPopulator::InsertOrderRecord(const OrderRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertOrderRecord(const OrderRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateOrderSchema()->GetSchemaSize()];
 				SchemaRecord *order_record = new SchemaRecord(TpccSchema::GenerateOrderSchema(), data);
 				order_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->o_id_));
@@ -363,7 +384,8 @@ namespace Cavalia{
 				storage_manager_->tables_[ORDER_TABLE_ID]->InsertRecord(new TableRecord(order_record));
 			}
 
-			void TpccPopulator::InsertNewOrderRecord(const NewOrderRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertNewOrderRecord(const NewOrderRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateNewOrderSchema()->GetSchemaSize()];
 				SchemaRecord *new_order_record = new SchemaRecord(TpccSchema::GenerateNewOrderSchema(), data);
 				new_order_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->o_id_));
@@ -372,7 +394,8 @@ namespace Cavalia{
 				storage_manager_->tables_[NEW_ORDER_TABLE_ID]->InsertRecord(new TableRecord(new_order_record));
 			}
 
-			void TpccPopulator::InsertOrderLineRecord(const OrderLineRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertOrderLineRecord(const OrderLineRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateOrderLineSchema()->GetSchemaSize()];
 				SchemaRecord *order_line_record = new SchemaRecord(TpccSchema::GenerateOrderLineSchema(), data);
 				order_line_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->ol_o_id_));
@@ -388,7 +411,8 @@ namespace Cavalia{
 				storage_manager_->tables_[ORDER_LINE_TABLE_ID]->InsertRecord(new TableRecord(order_line_record));
 			}
 
-			void TpccPopulator::InsertHistoryRecord(const HistoryRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertHistoryRecord(const HistoryRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateHistorySchema()->GetSchemaSize()];
 				SchemaRecord *history_record = new SchemaRecord(TpccSchema::GenerateHistorySchema(), data);
 				history_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->h_c_id_));
@@ -402,7 +426,8 @@ namespace Cavalia{
 				storage_manager_->tables_[HISTORY_TABLE_ID]->InsertRecord(new TableRecord(history_record));
 			}
 
-			void TpccPopulator::InsertDistrictNewOrderRecord(const DistrictNewOrderRecord* record_ptr){
+			template <typename Table> requires IsTable<Table>
+			void TpccPopulator<Table>::InsertDistrictNewOrderRecord(const DistrictNewOrderRecord* record_ptr){
 				char *data = new char[TpccSchema::GenerateDistrictNewOrderSchema()->GetSchemaSize()];
 				SchemaRecord *district_new_order_record = new SchemaRecord(TpccSchema::GenerateDistrictNewOrderSchema(), data);
 				district_new_order_record->SetColumn(0, reinterpret_cast<const char*>(&record_ptr->d_id_));
@@ -414,3 +439,4 @@ namespace Cavalia{
 		}
 	}
 }
+#endif

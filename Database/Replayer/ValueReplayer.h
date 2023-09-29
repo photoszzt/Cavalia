@@ -7,9 +7,10 @@
 namespace Cavalia{
 	namespace Database{
 
-		class ValueReplayer : public BaseReplayer{
+		template <typename Table> requires IsTable<Table>
+		class ValueReplayer : public BaseReplayer<Table>{
 		public:
-			ValueReplayer(const std::string &filename, BaseStorageManager *const storage_manager, const size_t &thread_count) : BaseReplayer(filename, storage_manager, thread_count, true){
+			ValueReplayer(const std::string &filename, BaseStorageManager<Table> *const storage_manager, const size_t &thread_count) : BaseReplayer(filename, storage_manager, thread_count, true){
 				log_entries_ = new ValueLogEntries[thread_count_];
 			}
 			virtual ~ValueReplayer(){

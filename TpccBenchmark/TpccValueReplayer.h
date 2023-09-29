@@ -11,9 +11,11 @@ namespace Cavalia{
 		namespace Tpcc{
 			namespace Replayer{
 				using namespace Cavalia::Database;
-				class TpccValueReplayer : public ValueReplayer{
+
+				template <typename Table> requires IsTable<Table>
+				class TpccValueReplayer : public ValueReplayer<Table>{
 				public:
-					TpccValueReplayer(const std::string &filename, BaseStorageManager *const storage_manager, const size_t &thread_count) : ValueReplayer(filename, storage_manager, thread_count){}
+					TpccValueReplayer(const std::string &filename, BaseStorageManager<Table> *const storage_manager, const size_t &thread_count) : ValueReplayer(filename, storage_manager, thread_count){}
 					virtual ~TpccValueReplayer(){}
 
 					virtual RecordSchema *GetRecordSchema(const size_t &table_id){

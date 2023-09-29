@@ -2,16 +2,18 @@
 #ifndef __CAVALIA_BENCHMARK_FRAMEWORK_BENCHMARK_POPULATOR_H__
 #define __CAVALIA_BENCHMARK_FRAMEWORK_BENCHMARK_POPULATOR_H__
 
-
+#include <concepts>
 #include <TimeMeasurer.h>
+#include "ClassHelper.h"
 #include "../Storage/BaseStorageManager.h"
 
 namespace Cavalia{
 	namespace Benchmark{
 		using namespace Cavalia::Database;
+		template<typename Table> requires IsTable<Table>
 		class BenchmarkPopulator{
 		public:
-			BenchmarkPopulator(BaseStorageManager *storage_manager) : storage_manager_(storage_manager){}
+			BenchmarkPopulator(BaseStorageManager<Table> *storage_manager) : storage_manager_(storage_manager){}
 			virtual ~BenchmarkPopulator(){}
 
 			void Start(){
@@ -38,7 +40,7 @@ namespace Cavalia{
 			BenchmarkPopulator& operator=(const BenchmarkPopulator &);
 
 		protected:
-			BaseStorageManager *const storage_manager_;
+			BaseStorageManager<Table> *const storage_manager_;
 		};
 	}
 }

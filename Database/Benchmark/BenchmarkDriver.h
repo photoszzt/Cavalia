@@ -13,9 +13,9 @@ if (std::filesystem::exists(full_name) == false){ \
 
 #define POPULATE_STORAGE(BenchmarkName, DirName) \
 	ShareStorageManager storage_manager(DirName+"/"#BenchmarkName"/Checkpoint", false); \
-	BenchmarkName##TableInitiator initiator; \
+	BenchmarkName##TableInitiator<ShareTable> initiator; \
 	initiator.Initialize(&storage_manager); \
-	BenchmarkName##Populator populator(&params, &storage_manager); \
+	BenchmarkName##Populator<ShareTable> populator(&params, &storage_manager); \
 	populator.Start();
 
 #define CHECKPOINT_STORAGE \
@@ -49,7 +49,7 @@ if (std::filesystem::exists(full_name) == false){ \
 ///////////////////////////////////////////////////////////
 #define RELOAD_STORAGE(BenchmarkName, DirName, ThreadSafe) \
 	ShareStorageManager storage_manager(DirName+"/"#BenchmarkName"/Checkpoint", ThreadSafe); \
-	BenchmarkName##TableInitiator initiator; \
+	BenchmarkName##TableInitiator<ShareTable> initiator; \
 	initiator.Initialize(&storage_manager); \
 	storage_manager.ReloadCheckpoint();
 

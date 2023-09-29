@@ -9,9 +9,13 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Tpcc{
 			namespace AtomicProcedures{
-				class OrderStatusProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class OrderStatusProcedure : public StoredProcedure<Table>{
 				public:
-					OrderStatusProcedure(const size_t &txn_type) : StoredProcedure(txn_type){
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+
+					OrderStatusProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){
 						context_.is_read_only_ = true;
 						order_line_records = new SchemaRecords(15);
 					}
@@ -20,7 +24,7 @@ namespace Cavalia{
 					virtual bool Execute(TxnParam *param, CharArray &ret, const ExeContext &exe_context){
 						context_.PassContext(exe_context);
 						const OrderStatusParam *order_status_param = static_cast<const OrderStatusParam*>(param);
-						
+
 						if (order_status_param->c_id_ == -1){
 							// "getCustomersByLastName": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_BALANCE FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_LAST = ? ORDER BY C_FIRST"
 						}
@@ -34,7 +38,7 @@ namespace Cavalia{
 						SchemaRecord *order_record = NULL;
 						// "getLastOrder": "SELECT O_ID, O_CARRIER_ID, O_ENTRY_D FROM ORDERS WHERE O_W_ID = ? AND O_D_ID = ? AND O_C_ID = ? ORDER BY O_ID DESC LIMIT 1"
 						DB_QUERY(SelectRecord(&context_, ORDER_TABLE_ID, 0, std::string(o_key, sizeof(int)* 3), order_record, READ_ONLY));
-						
+
 						if (order_record != NULL){
 							int o_id = *(char*)(order_record->GetColumn(0));
 							memcpy(ol_key, &o_id, sizeof(o_id));

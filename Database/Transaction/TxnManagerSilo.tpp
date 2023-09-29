@@ -1,16 +1,14 @@
-#if defined(OCC)
+#if defined(SILO)
 #include "TransactionManager.h"
 
-namespace Cavalia {
-	namespace Database {
-		bool TransactionManager::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record) {
-			(void) context;
-			(void) primary_key;
+namespace Cavalia{
+	namespace Database{
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record){
 			BEGIN_PHASE_MEASURE(thread_id_, INSERT_PHASE);
 			// insert with visibility bit set to false.
 			record->is_visible_ = false;
 			TableRecord *tb_record = new TableRecord(record);
-			// the to-be-inserted record may have already existed.
 			//if (storage_manager_->tables_[table_id]->InsertRecord(primary_key, tb_record) == true){
 				Access *access = access_list_.NewAccess();
 				access->access_type_ = INSERT_ONLY;
@@ -18,6 +16,7 @@ namespace Cavalia {
 				access->local_record_ = NULL;
 				access->table_id_ = table_id;
 				access->timestamp_ = 0;
+				write_list_.Add(access);
 				END_PHASE_MEASURE(thread_id_, INSERT_PHASE);
 				return true;
 			/*}
@@ -28,9 +27,9 @@ namespace Cavalia {
 			}*/
 		}
 
-		bool TransactionManager::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
-			(void) context;
-			if (access_type == READ_ONLY) {
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
+			if (access_type == READ_ONLY){
 				Access *access = access_list_.NewAccess();
 				access->access_type_ = READ_ONLY;
 				access->access_record_ = t_record;
@@ -40,7 +39,7 @@ namespace Cavalia {
 				s_record = t_record->record_;
 				return true;
 			}
-			else if (access_type == READ_WRITE) {
+			else if (access_type == READ_WRITE){
 				Access *access = access_list_.NewAccess();
 				access->access_type_ = READ_WRITE;
 				access->access_record_ = t_record;
@@ -56,11 +55,11 @@ namespace Cavalia {
 				local_record->CopyFrom(t_record->record_);
 				access->local_record_ = local_record;
 				access->table_id_ = table_id;
+				write_list_.Add(access);
 				// reset returned record.
 				s_record = local_record;
 				return true;
 			}
-			// we just need to set the visibility bit on the record. so no need to create local copy.
 			else if (access_type == DELETE_ONLY){
 				Access *access = access_list_.NewAccess();
 				access->access_type_ = DELETE_ONLY;
@@ -68,6 +67,7 @@ namespace Cavalia {
 				access->local_record_ = NULL;
 				access->table_id_ = table_id;
 				access->timestamp_ = t_record->content_.GetTimestamp();
+				write_list_.Add(access);
 				s_record = t_record->record_;
 				return true;
 			}
@@ -77,80 +77,77 @@ namespace Cavalia {
 			}
 		}
 
-		bool TransactionManager::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
-			(void) param;
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
 			BEGIN_PHASE_MEASURE(thread_id_, COMMIT_PHASE);
-			// step 1: acquire lock and validate
-			size_t lock_count = 0;
+			// step 1: acquire write lock.
+			write_list_.Sort();
+			for (size_t i = 0; i < write_list_.access_count_; ++i){
+				Access *access_ptr = write_list_.GetAccess(i);
+				access_ptr->access_record_->content_.AcquireWriteLock();
+			}
+			// should also update readers' timestamps.
+
+			BEGIN_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
+			uint64_t curr_epoch = Epoch::GetEpoch();
+			END_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
+
+			// setp 2: validate read.
 			bool is_success = true;
-			access_list_.Sort();
-			for (size_t i = 0; i < access_list_.access_count_; ++i) {
-				++lock_count;
+			for (size_t i = 0; i < access_list_.access_count_; ++i){
 				Access *access_ptr = access_list_.GetAccess(i);
 				auto &content_ref = access_ptr->access_record_->content_;
-				if (access_ptr->access_type_ == READ_ONLY) {
-					// acquire read lock
-					content_ref.AcquireReadLock();
-					// whether someone has changed the tuple after my read
-					if (content_ref.GetTimestamp() != access_ptr->timestamp_) {
-						UPDATE_CC_ABORT_COUNT(thread_id_, context->txn_type_, access_ptr->table_id_);
+				if (access_ptr->access_type_ == READ_WRITE){
+					if (content_ref.GetTimestamp() != access_ptr->timestamp_){
 						is_success = false;
 						break;
 					}
 				}
-				else if (access_ptr->access_type_ == READ_WRITE) {
-					// acquire write lock
-					content_ref.AcquireWriteLock();
-					// whether someone has changed the tuple after my read
-					if (content_ref.GetTimestamp() != access_ptr->timestamp_) {
-						UPDATE_CC_ABORT_COUNT(thread_id_, context->txn_type_, access_ptr->table_id_);
+				else if (access_ptr->access_type_ == READ_ONLY){
+					if (content_ref.ExistsWriteLock() ||
+						content_ref.GetTimestamp() != access_ptr->timestamp_){
 						is_success = false;
 						break;
 					}
-				}
-				else {
-					// insert_only or delete_only
-					content_ref.AcquireWriteLock();
 				}
 			}
 
-			// step 2: if success, then overwrite and commit
-			if (is_success == true) {
-				BEGIN_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
-				uint64_t curr_epoch = Epoch::GetEpoch();
 #if defined(SCALABLE_TIMESTAMP)
-				uint64_t max_rw_ts = 0;
-				for (size_t i = 0; i < access_list_.access_count_; ++i){
-					Access *access_ptr = access_list_.GetAccess(i);
-					if (access_ptr->timestamp_ > max_rw_ts){
-						max_rw_ts = access_ptr->timestamp_;
-					}
+			uint64_t max_rw_ts = 0;
+			for (size_t i = 0; i < access_list_.access_count_; ++i){
+				Access *access_ptr = access_list_.GetAccess(i);
+				if (access_ptr->timestamp_ > max_rw_ts){
+					max_rw_ts = access_ptr->timestamp_;
 				}
+			}
+#endif
+
+			// step 3: if success, then overwrite and commit
+			if (is_success == true){
+				BEGIN_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
+#if defined(SCALABLE_TIMESTAMP)
 				uint64_t commit_ts = GenerateScalableTimestamp(curr_epoch, max_rw_ts);
 #else
 				uint64_t commit_ts = GenerateMonotoneTimestamp(curr_epoch, GlobalTimestamp::GetMonotoneTimestamp());
 #endif
 				END_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
 
-				for (size_t i = 0; i < access_list_.access_count_; ++i) {
-					Access *access_ptr = access_list_.GetAccess(i);
+				for (size_t i = 0; i < write_list_.access_count_; ++i){
+					Access *access_ptr = write_list_.GetAccess(i);
 					SchemaRecord *global_record_ptr = access_ptr->access_record_->record_;
 					SchemaRecord *local_record_ptr = access_ptr->local_record_;
 					auto &content_ref = access_ptr->access_record_->content_;
-					if (access_ptr->access_type_ == READ_WRITE) {
-						assert(commit_ts > access_ptr->timestamp_);
+					if (access_ptr->access_type_ == READ_WRITE){
 						global_record_ptr->CopyFrom(local_record_ptr);
 						COMPILER_MEMORY_FENCE;
 						content_ref.SetTimestamp(commit_ts);
 					}
-					else if (access_ptr->access_type_ == INSERT_ONLY) {
-						assert(commit_ts > access_ptr->timestamp_);
+					else if (access_ptr->access_type_ == INSERT_ONLY){
 						global_record_ptr->is_visible_ = true;
 						COMPILER_MEMORY_FENCE;
 						content_ref.SetTimestamp(commit_ts);
 					}
-					else if (access_ptr->access_type_ == DELETE_ONLY) {
-						assert(commit_ts > access_ptr->timestamp_);
+					else if (access_ptr->access_type_ == DELETE_ONLY){
 						global_record_ptr->is_visible_ = false;
 						COMPILER_MEMORY_FENCE;
 						content_ref.SetTimestamp(commit_ts);
@@ -166,13 +163,10 @@ namespace Cavalia {
 				logger_->CommitTransaction(this->thread_id_, curr_epoch, commit_ts, context->txn_type_, param);
 #endif
 
-				// step 3: release locks and clean up.
-				for (size_t i = 0; i < access_list_.access_count_; ++i) {
-					Access *access_ptr = access_list_.GetAccess(i);
-					if (access_ptr->access_type_ == READ_ONLY) {
-						access_ptr->access_record_->content_.ReleaseReadLock();
-					}
-					else if (access_ptr->access_type_ == READ_WRITE) {
+				// step 4: release locks and clean up.
+				for (size_t i = 0; i < write_list_.access_count_; ++i){
+					Access *access_ptr = write_list_.GetAccess(i);
+					if (access_ptr->access_type_ == READ_WRITE){
 						access_ptr->access_record_->content_.ReleaseWriteLock();
 						BEGIN_CC_MEM_ALLOC_TIME_MEASURE(thread_id_);
 						SchemaRecord *local_record_ptr = access_ptr->local_record_;
@@ -188,17 +182,14 @@ namespace Cavalia {
 				}
 			}
 			// if failed.
-			else {
-				// step 3: release locks and clean up.
-				for (size_t i = 0; i < access_list_.access_count_; ++i) {
-					Access *access_ptr = access_list_.GetAccess(i);
-					if (access_ptr->access_type_ == READ_ONLY) {
-						access_ptr->access_record_->content_.ReleaseReadLock();
-					}
-					else if (access_ptr->access_type_ == READ_WRITE) {
-						SchemaRecord *local_record_ptr = access_ptr->local_record_;
+			else{
+				// step 4: release locks and clean up.
+				for (size_t i = 0; i < write_list_.access_count_; ++i){
+					Access *access_ptr = write_list_.GetAccess(i);
+					if (access_ptr->access_type_ == READ_WRITE){
 						access_ptr->access_record_->content_.ReleaseWriteLock();
 						BEGIN_CC_MEM_ALLOC_TIME_MEASURE(thread_id_);
+						SchemaRecord *local_record_ptr = access_ptr->local_record_;
 						MemAllocator::Free(local_record_ptr->data_ptr_);
 						local_record_ptr->~SchemaRecord();
 						MemAllocator::Free((char*)local_record_ptr);
@@ -208,19 +199,17 @@ namespace Cavalia {
 						// insert_only or delete_only
 						access_ptr->access_record_->content_.ReleaseWriteLock();
 					}
-					--lock_count;
-					if (lock_count == 0) {
-						break;
-					}
 				}
 			}
 			assert(access_list_.access_count_ <= kMaxAccessNum);
+			write_list_.Clear();
 			access_list_.Clear();
 			END_PHASE_MEASURE(thread_id_, COMMIT_PHASE);
 			return is_success;
 		}
 
-		void TransactionManager::AbortTransaction() {
+		template <typename Table> requires IsTable<Table>
+		void TransactionManager<Table>::AbortTransaction() {
 			assert(false);
 		}
 	}

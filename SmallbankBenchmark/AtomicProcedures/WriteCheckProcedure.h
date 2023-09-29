@@ -9,9 +9,12 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Smallbank{
 			namespace AtomicProcedures{
-				class WriteCheckProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class WriteCheckProcedure : public StoredProcedure<Table>{
 				public:
-					WriteCheckProcedure(const size_t &txn_type) : StoredProcedure(txn_type){
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+					WriteCheckProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){
 						context_.is_dependent_ = true;
 					}
 					virtual ~WriteCheckProcedure(){}
@@ -31,7 +34,7 @@ namespace Cavalia{
 						float balance = *(float*)(savings_record->GetColumn(1)) + *(float*)(checking_record->GetColumn(1));
 						float final_checking = 0.0;
 						if (balance < wc_param->amount_) {
-							final_checking = balance - (wc_param->amount_ + 1); // maybe negative 
+							final_checking = balance - (wc_param->amount_ + 1); // maybe negative
 							checking_record->UpdateColumn(1, (char*)(&final_checking));
 						}
 						else{

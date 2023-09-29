@@ -16,31 +16,33 @@ namespace Cavalia{
 		namespace Smallbank{
 			namespace Replayer{
 				using namespace Cavalia::Database;
-				class SmallbankSerialCommandReplayer : public SerialCommandReplayer{
+				template <typename Table> requires IsTable<Table>
+				class SmallbankSerialCommandReplayer : public SerialCommandReplayer<Table>{
 				public:
-					SmallbankSerialCommandReplayer(const std::string &filename, BaseStorageManager *const storage_manager, const size_t &thread_count) : SerialCommandReplayer(filename, storage_manager, thread_count){}
+					using SerialCommandReplayer::registers_;
+					SmallbankSerialCommandReplayer(const std::string &filename, BaseStorageManager<Table> *const storage_manager, const size_t &thread_count) : SerialCommandReplayer(filename, storage_manager, thread_count){}
 					virtual ~SmallbankSerialCommandReplayer(){}
 
 				private:
 					virtual void PrepareProcedures(){
 						using namespace AtomicProcedures;
 						registers_[TupleType::AMALGAMATE] = [](){
-							return new AmalgamateProcedure(TupleType::AMALGAMATE);
+							return new AmalgamateProcedure<Table>(TupleType::AMALGAMATE);
 						};
 						registers_[TupleType::BALANCE] = [](){
-							return new BalanceProcedure(TupleType::BALANCE);
+							return new BalanceProcedure<Table>(TupleType::BALANCE);
 						};
 						registers_[TupleType::DEPOSIT_CHECKING] = [](){
-							return new DepositCheckingProcedure(TupleType::DEPOSIT_CHECKING);
+							return new DepositCheckingProcedure<Table>(TupleType::DEPOSIT_CHECKING);
 						};
 						registers_[TupleType::SEND_PAYMENT] = [](){
-							return new SendPaymentProcedure(TupleType::SEND_PAYMENT);
+							return new SendPaymentProcedure<Table>(TupleType::SEND_PAYMENT);
 						};
 						registers_[TupleType::TRANSACT_SAVINGS] = [](){
-							return new TransactSavingsProcedure(TupleType::TRANSACT_SAVINGS);
+							return new TransactSavingsProcedure<Table>(TupleType::TRANSACT_SAVINGS);
 						};
 						registers_[TupleType::WRITE_CHECK] = [](){
-							return new WriteCheckProcedure(TupleType::WRITE_CHECK);
+							return new WriteCheckProcedure<Table>(TupleType::WRITE_CHECK);
 						};
 					}
 

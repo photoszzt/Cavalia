@@ -8,9 +8,10 @@
 
 namespace Cavalia{
 	namespace Database{
+		template <typename Table> requires IsTable<Table>
 		class BaseCommandReplayer : public BaseReplayer{
 		public:
-			BaseCommandReplayer(const std::string &filename, BaseStorageManager *const storage_manager, const size_t &thread_count) : BaseReplayer(filename, storage_manager, thread_count, false){
+			BaseCommandReplayer(const std::string &filename, BaseStorageManager<Table> *const storage_manager, const size_t &thread_count) : BaseReplayer(filename, storage_manager, thread_count, false){
 				log_sequences_ = new std::vector<std::pair<uint64_t, BaseLogEntries*>>[thread_count_];
 			}
 			virtual ~BaseCommandReplayer(){
@@ -93,7 +94,7 @@ namespace Cavalia{
 						size_t param_type;
 						memcpy(&param_type, buffer + buffer_offset, sizeof(param_type));
 						buffer_offset += sizeof(param_type);
-					
+
 						uint64_t timestamp;
 						memcpy(&timestamp, buffer + buffer_offset, sizeof(timestamp));
 						buffer_offset += sizeof(timestamp);
@@ -153,13 +154,13 @@ namespace Cavalia{
 
 			void ReorderLog(){
 				int batch_count = log_sequences_[0].size();
-				
-				
+
+
 				for (size_t i = 0; i < thread_count_; ++i){
 					std::cout << "thread id=" << i << ", size=" << log_sequences_[i].size() << std::endl;
 				}
 				BaseLogEntries::iterator *iterators = new BaseLogEntries::iterator[thread_count_];
-				
+
 				for (size_t k = 0; k < batch_count; ++k){
 					// check epoch.
 					uint64_t curr_epoch = log_sequences_[0].at(k).first;
@@ -198,7 +199,7 @@ namespace Cavalia{
 				}
 				delete[] iterators;
 				iterators = NULL;
-				
+
 				size_t total_size = 0;
 				for (size_t k = 0; k < batch_count; ++k){
 					std::cout << "log size=" << serial_log_sequences_.at(k).second->size() << std::endl;

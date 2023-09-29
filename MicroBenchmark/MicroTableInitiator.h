@@ -8,12 +8,13 @@
 namespace Cavalia{
 	namespace Benchmark{
 		namespace Micro{
-			class MicroTableInitiator : public BenchmarkTableInitiator{
+			template <typename Table> requires IsTable<Table>
+			class MicroTableInitiator : public BenchmarkTableInitiator<Table>{
 			public:
 				MicroTableInitiator(){}
 				virtual ~MicroTableInitiator(){}
 
-				virtual void Initialize(BaseStorageManager *storage_manager){
+				virtual void Initialize(BaseStorageManager<Table> *storage_manager){
 					std::unordered_map<size_t, RecordSchema*> schema;
 					schema[MICRO_TABLE_ID] = MicroSchema::GenerateMicroSchema();
 					storage_manager->RegisterTables(schema);

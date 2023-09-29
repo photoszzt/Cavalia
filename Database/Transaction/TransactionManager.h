@@ -3,6 +3,7 @@
 #define __CAVALIA_DATABASE_TRANSACTION_MANAGER_H__
 
 #include <list>
+#include <concepts>
 #include <AllocatorHelper.h>
 #include "../Meta/MetaTypes.h"
 #include "../Profiler/Profilers.h"
@@ -25,23 +26,24 @@
 namespace Cavalia{
 	namespace Database{
 
+		template <typename Table> requires IsTable<Table>
 		class TransactionManager{
 		public:
 			// for executors
-			TransactionManager(BaseStorageManager *const storage_manager, BaseLogger *const logger, const size_t &thread_id, const size_t &thread_count) : storage_manager_(storage_manager), logger_(logger), thread_id_(thread_id), thread_count_(thread_count){
+			TransactionManager(BaseStorageManager<Table> *const storage_manager, BaseLogger *const logger, const size_t &thread_id, const size_t &thread_count) : storage_manager_(storage_manager), logger_(logger), thread_id_(thread_id), thread_count_(thread_count){
 				table_count_ = storage_manager->table_count_;
 				is_first_access_ = true;
 				local_epoch_ = 0;
 				local_ts_ = 0;
 				t_records_ = new TableRecords(64);
-				
+
 				// for multi-version concurrency-control schemes.
 				this->progress_ts_ = 0;
 				GlobalTimestamp::thread_timestamp_[thread_id_] = &(this->progress_ts_);
 			}
 
 			// for replayer.
-			TransactionManager(BaseStorageManager *const storage_manager, BaseLogger *const logger) : storage_manager_(storage_manager), logger_(logger){}
+			TransactionManager(BaseStorageManager<Table> *const storage_manager, BaseLogger *const logger) : storage_manager_(storage_manager), logger_(logger){}
 
 			// destruction.
 			virtual ~TransactionManager(){}
@@ -208,7 +210,7 @@ namespace Cavalia{
 			TransactionManager& operator=(const TransactionManager &);
 
 		protected:
-			BaseStorageManager *const storage_manager_;
+			BaseStorageManager<Table> *const storage_manager_;
 			BaseLogger *const logger_;
 			size_t thread_id_;
 			size_t thread_count_;
@@ -241,5 +243,24 @@ namespace Cavalia{
 		};
 	}
 }
+
+#include "TransactionManagerST.tpp"
+#include "TxnManagerDbx.tpp"
+#include "TxnManagerLock.tpp"
+#include "TxnManagerLockRtm.tpp"
+#include "TxnManagerLockWait.tpp"
+#include "TxnManagerMvLock.tpp"
+#include "TxnManagerMvLockWait.tpp"
+#include "TxnManagerMvOcc.tpp"
+#include "TxnManagerMvTo.tpp"
+#include "TxnManagerOcc.tpp"
+#include "TxnManagerOccRtm.tpp"
+#include "TxnManagerRtm.tpp"
+#include "TxnManagerSiLock.tpp"
+#include "TxnManagerSiOcc.tpp"
+#include "TxnManagerSilo.tpp"
+#include "TxnManagerTo.tpp"
+#include "TxnManagerTvLock.tpp"
+
 
 #endif

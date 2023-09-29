@@ -11,9 +11,13 @@ namespace Cavalia{
 		namespace Tpcc{
 			namespace AtomicProcedures{
 
-				class DeliveryProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class DeliveryProcedure : public StoredProcedure<Table>{
 				public:
-					DeliveryProcedure(const size_t &txn_type) : StoredProcedure(txn_type){
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+
+					DeliveryProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){
 						order_line_records = new SchemaRecords(15);
 						context_.is_dependent_ = true;
 					}

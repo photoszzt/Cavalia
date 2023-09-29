@@ -11,9 +11,10 @@ namespace Cavalia{
 		namespace Smallbank{
 			namespace Replayer{
 				using namespace Cavalia::Database;
-				class SmallbankValueReplayer : public ValueReplayer{
+				template <typename Table> requires IsTable<Table>
+				class SmallbankValueReplayer : public ValueReplayer<Table>{
 				public:
-					SmallbankValueReplayer(const std::string &filename, BaseStorageManager *const storage_manager, const size_t &thread_count) : ValueReplayer(filename, storage_manager, thread_count){}
+					SmallbankValueReplayer(const std::string &filename, BaseStorageManager<Table> *const storage_manager, const size_t &thread_count) : ValueReplayer(filename, storage_manager, thread_count){}
 					virtual ~SmallbankValueReplayer(){}
 
 					virtual RecordSchema *GetRecordSchema(const size_t &table_id){

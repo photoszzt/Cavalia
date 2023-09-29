@@ -8,12 +8,13 @@
 namespace Cavalia{
 	namespace Benchmark{
 		namespace Smallbank{
-			class SmallbankTableInitiator : public BenchmarkTableInitiator{
+			template <typename Table> requires IsTable<Table>
+			class SmallbankTableInitiator : public BenchmarkTableInitiator<Table>{
 			public:
 				SmallbankTableInitiator(){}
 				virtual ~SmallbankTableInitiator(){}
 
-				virtual void Initialize(BaseStorageManager *storage_manager){
+				virtual void Initialize(BaseStorageManager<Table> *storage_manager){
 					std::unordered_map<size_t, RecordSchema*> schema;
 					schema[ACCOUNTS_TABLE_ID] = SmallbankSchema::GenerateAccountsSchema();
 					schema[SAVINGS_TABLE_ID] = SmallbankSchema::GenerateSavingsSchema();

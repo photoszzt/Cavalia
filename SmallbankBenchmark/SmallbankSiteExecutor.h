@@ -16,60 +16,63 @@ namespace Cavalia {
 		namespace Smallbank {
 			namespace Executor {
 				using namespace ShardProcedures;
-				class SmallbankSiteExecutor : public SiteExecutor {
+				template <typename Table> requires IsTable<Table>
+				class SmallbankSiteExecutor : public SiteExecutor<Table> {
 				public:
-					SmallbankSiteExecutor(IORedirector *const redirector, BaseStorageManager *const storage_manager, BaseLogger *const logger, const SiteTxnLocation &txn_location) : SiteExecutor(redirector, storage_manager, logger, txn_location) {}
+					using SiteExecutor<Table>::registers_;
+					using SiteExecutor<Table>::deregisters_;
+					SmallbankSiteExecutor(IORedirector *const redirector, BaseStorageManager<Table> *const storage_manager, BaseLogger *const logger, const SiteTxnLocation &txn_location) : SiteExecutor(redirector, storage_manager, logger, txn_location) {}
 					virtual ~SmallbankSiteExecutor() {}
 
 				private:
 					virtual void PrepareProcedures() {
 						registers_[TupleType::AMALGAMATE] = [](size_t node_id) {
-							AmalgamateShardProcedure *procedure = (AmalgamateShardProcedure*)MemAllocator::AllocNode(sizeof(AmalgamateShardProcedure), node_id);
-							new(procedure)AmalgamateShardProcedure(TupleType::AMALGAMATE);
+							AmalgamateShardProcedure<Table> *procedure = (AmalgamateShardProcedure<Table>*)MemAllocator::AllocNode(sizeof(AmalgamateShardProcedure<Table>), node_id);
+							new(procedure)AmalgamateShardProcedure<Table>(TupleType::AMALGAMATE);
 							return procedure;
 						};
 						deregisters_[TupleType::AMALGAMATE] = [](char *ptr){
-							MemAllocator::FreeNode(ptr, sizeof(AmalgamateShardProcedure));
+							MemAllocator::FreeNode(ptr, sizeof(AmalgamateShardProcedure<Table>));
 						};
 						registers_[TupleType::BALANCE] = [](size_t node_id) {
-							BalanceShardProcedure *procedure = (BalanceShardProcedure*)MemAllocator::AllocNode(sizeof(BalanceShardProcedure), node_id);
-							new(procedure)BalanceShardProcedure(TupleType::BALANCE);
+							BalanceShardProcedure<Table> *procedure = (BalanceShardProcedure<Table>*)MemAllocator::AllocNode(sizeof(BalanceShardProcedure<Table>), node_id);
+							new(procedure)BalanceShardProcedure<Table>(TupleType::BALANCE);
 							return procedure;
 						};
 						deregisters_[TupleType::BALANCE] = [](char *ptr){
-							MemAllocator::FreeNode(ptr, sizeof(BalanceShardProcedure));
+							MemAllocator::FreeNode(ptr, sizeof(BalanceShardProcedure<Table>));
 						};
 						registers_[TupleType::DEPOSIT_CHECKING] = [](size_t node_id) {
-							DepositCheckingShardProcedure *procedure = (DepositCheckingShardProcedure*)MemAllocator::AllocNode(sizeof(DepositCheckingShardProcedure), node_id);
-							new(procedure)DepositCheckingShardProcedure(TupleType::DEPOSIT_CHECKING);
+							DepositCheckingShardProcedure<Table> *procedure = (DepositCheckingShardProcedure<Table>*)MemAllocator::AllocNode(sizeof(DepositCheckingShardProcedure<Table>), node_id);
+							new(procedure)DepositCheckingShardProcedure<Table>(TupleType::DEPOSIT_CHECKING);
 							return procedure;
 						};
 						deregisters_[TupleType::DEPOSIT_CHECKING] = [](char *ptr){
-							MemAllocator::FreeNode(ptr, sizeof(DepositCheckingShardProcedure));
+							MemAllocator::FreeNode(ptr, sizeof(DepositCheckingShardProcedure<Table>));
 						};
 						registers_[TupleType::SEND_PAYMENT] = [](size_t node_id) {
-							SendPaymentShardProcedure *procedure = (SendPaymentShardProcedure*)MemAllocator::AllocNode(sizeof(SendPaymentShardProcedure), node_id);
-							new(procedure)SendPaymentShardProcedure(TupleType::SEND_PAYMENT);
+							SendPaymentShardProcedure<Table> *procedure = (SendPaymentShardProcedure<Table>*)MemAllocator::AllocNode(sizeof(SendPaymentShardProcedure<Table>), node_id);
+							new(procedure)SendPaymentShardProcedure<Table>(TupleType::SEND_PAYMENT);
 							return procedure;
 						};
 						deregisters_[TupleType::SEND_PAYMENT] = [](char *ptr){
-							MemAllocator::FreeNode(ptr, sizeof(SendPaymentShardProcedure));
+							MemAllocator::FreeNode(ptr, sizeof(SendPaymentShardProcedure<Table>));
 						};
 						registers_[TupleType::TRANSACT_SAVINGS] = [](size_t node_id) {
-							TransactSavingsShardProcedure *procedure = (TransactSavingsShardProcedure*)MemAllocator::AllocNode(sizeof(TransactSavingsShardProcedure), node_id);
-							new(procedure)TransactSavingsShardProcedure(TupleType::TRANSACT_SAVINGS);
+							TransactSavingsShardProcedure<Table> *procedure = (TransactSavingsShardProcedure<Table>*)MemAllocator::AllocNode(sizeof(TransactSavingsShardProcedure<Table>), node_id);
+							new(procedure)TransactSavingsShardProcedure<Table>(TupleType::TRANSACT_SAVINGS);
 							return procedure;
 						};
 						deregisters_[TupleType::TRANSACT_SAVINGS] = [](char *ptr){
-							MemAllocator::FreeNode(ptr, sizeof(TransactSavingsShardProcedure));
+							MemAllocator::FreeNode(ptr, sizeof(TransactSavingsShardProcedure<Table>));
 						};
 						registers_[TupleType::WRITE_CHECK] = [](size_t node_id) {
-							WriteCheckShardProcedure *procedure = (WriteCheckShardProcedure*)MemAllocator::AllocNode(sizeof(WriteCheckShardProcedure), node_id);
-							new(procedure)WriteCheckShardProcedure(TupleType::WRITE_CHECK);
+							WriteCheckShardProcedure<Table> *procedure = (WriteCheckShardProcedure<Table>*)MemAllocator::AllocNode(sizeof(WriteCheckShardProcedure<Table>), node_id);
+							new(procedure)WriteCheckShardProcedure<Table>(TupleType::WRITE_CHECK);
 							return procedure;
 						};
 						deregisters_[TupleType::WRITE_CHECK] = [](char *ptr){
-							MemAllocator::FreeNode(ptr, sizeof(WriteCheckShardProcedure));
+							MemAllocator::FreeNode(ptr, sizeof(WriteCheckShardProcedure<Table>));
 						};
 					}
 

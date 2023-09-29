@@ -9,9 +9,13 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Tpcc{
 			namespace AtomicProcedures{
-				class NewOrderProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class NewOrderProcedure : public StoredProcedure<Table>{
 				public:
-					NewOrderProcedure(const size_t &txn_type) : StoredProcedure(txn_type){
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+
+					NewOrderProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){
 						ol_amounts = (double*)MemAllocator::Alloc(15 * sizeof(double));
 					}
 					virtual ~NewOrderProcedure(){

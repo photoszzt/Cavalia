@@ -45,11 +45,11 @@ namespace Cavalia{
 				out_stream.flush();
 			}
 
-		private:
-			CuckooIndex(const CuckooIndex &);
-			CuckooIndex& operator=(const CuckooIndex &);
+		// private:
+			CuckooIndex(const CuckooIndex &) = delete;
+			CuckooIndex& operator=(const CuckooIndex &) = delete;
 
-		private:
+		// private:
 			CuckooMap hash_index_;
 		};
 	}

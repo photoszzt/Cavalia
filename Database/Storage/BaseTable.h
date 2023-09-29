@@ -6,11 +6,40 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <concepts>
+#include "ClassHelper.h"
 #include "TableRecord.h"
 #include "TableRecords.h"
 
 namespace Cavalia{
 	namespace Database{
+		template <typename T>
+		concept IsTable =
+			requires(T table, const std::string &key, TableRecord *record,
+					 TableRecords *records, TableRecord *& record_ret,
+					 const size_t &part_id, const size_t &idx_id,
+					 const std::string &lower_key, std::string &upper_key) {
+				{ table.schema_ptr_ } -> std::same_as<const RecordSchema *const&>;
+				{ table.secondary_count_ } -> std::same_as<const size_t&>;
+				{ table.GetTableSize() } -> std::same_as<size_t>;
+				{ table.InsertRecord(record) } -> std::same_as<bool>;
+				{ table.InsertRecord(key, record) } -> std::same_as<bool>;
+				{ table.DeleteRecord(record) };
+				{ table.DeleteRecord(key, record) };
+				{ table.SelectKeyRecord(key, record_ret) };
+				{ table.SelectRecord(idx_id, key, record_ret) };
+				{ table.SelectRecord(part_id, idx_id, key, record_ret) };
+				{ table.SelectRecords(idx_id, key, records) };
+				{ table.SelectUpperRecords(idx_id, key, records) };
+				{ table.SelectLowerRecords(idx_id, key, records) };
+				{ table.SelectRangeRecords(idx_id, lower_key, upper_key, records) };
+			};
+
+		template <typename Table> requires IsTable<Table>
+		const size_t& GetRecordSize(Table* tab) {
+			return tab->schema_ptr_->GetSchemaSize();
+		}
+
 		class BaseTable {
 		public:
 			BaseTable(const RecordSchema * const schema_ptr) : schema_ptr_(schema_ptr), secondary_count_(schema_ptr->GetSecondaryCount()){}
@@ -46,9 +75,8 @@ namespace Cavalia{
 			virtual void SaveCheckpoint(std::ofstream &out_stream) = 0;
 			virtual void ReloadCheckpoint(std::ifstream &in_stream) = 0;
 
-		private:
-			BaseTable(const BaseTable&);
-			BaseTable & operator=(const BaseTable&);
+			BaseTable(const BaseTable&) = delete;
+			BaseTable & operator=(const BaseTable&) = delete;
 
 		protected:
 			const RecordSchema *const schema_ptr_;

@@ -3,37 +3,42 @@
 #define __CAVALIA_DATABASE_SHARE_TABLE_H__
 
 #include "BaseTable.h"
+#include "ClassHelper.h"
 #include "../Index/StdUnorderedIndex.h"
 #include "../Index/StdUnorderedIndexMT.h"
 #include "../Index/StdOrderedIndex.h"
 #include "../Index/StdOrderedIndexMT.h"
+#define PRIMARY_IDX StdUnorderedIndexMT
+#define SND_IDX StdOrderedIndexMT
 #if defined(CUCKOO_INDEX)
 #include "../Index/CuckooIndex.h"
+#undef PRIMARY_IDX
+#define PRIMARY_IDX CuckooIndex
 #endif
 
 namespace Cavalia{
 	namespace Database{
-		class ShareTable : public BaseTable {
+		class ShareTable {
 		public:
-			ShareTable(const RecordSchema * const schema_ptr, bool is_thread_safe) : BaseTable(schema_ptr){
-				if (is_thread_safe == true){
+			ShareTable(const RecordSchema * const schema_ptr, bool is_thread_safe) : schema_ptr_(schema_ptr), secondary_count_(schema_ptr->GetSecondaryCount()) {
+				// if (is_thread_safe == true){
 #if defined(CUCKOO_INDEX)
 					primary_index_ = new CuckooIndex();
 #else
 					primary_index_ = new StdUnorderedIndexMT();
 #endif
-					secondary_indexes_ = new BaseOrderedIndex*[secondary_count_];
+					secondary_indexes_ = new SND_IDX*[secondary_count_];
 					for (size_t i = 0; i < secondary_count_; ++i){
 						secondary_indexes_[i] = new StdOrderedIndexMT();
 					}
-				}
-				else{
-					primary_index_ = new StdUnorderedIndex();
-					secondary_indexes_ = new BaseOrderedIndex*[secondary_count_];
-					for (size_t i = 0; i < secondary_count_; ++i){
-						secondary_indexes_[i] = new StdOrderedIndex();
-					}
-				}
+				// }
+				// else{
+				// 	primary_index_ = new StdUnorderedIndex();
+				// 	secondary_indexes_ = new BaseOrderedIndex*[secondary_count_];
+				// 	for (size_t i = 0; i < secondary_count_; ++i){
+				// 		secondary_indexes_[i] = new StdOrderedIndex();
+				// 	}
+				// }
 			}
 
 			virtual ~ShareTable(){
@@ -181,7 +186,7 @@ namespace Cavalia{
 				primary_index_->SaveCheckpoint(out_stream, record_size);
 			}
 
-			virtual void ReloadCheckpoint(std::ifstream &in_stream){
+			void ReloadCheckpoint(std::ifstream &in_stream){
 				size_t record_size = schema_ptr_->GetSchemaSize();
 				in_stream.seekg(0, std::ios::end);
 				size_t file_size = static_cast<size_t>(in_stream.tellg());
@@ -197,15 +202,14 @@ namespace Cavalia{
 					file_pos += record_size;
 				}
 			}
+			DISALLOW_COPY_AND_ASSIGN(ShareTable);
 
-		private:
-			ShareTable(const ShareTable&);
-			ShareTable & operator=(const ShareTable&);
-
-		protected:
-			BaseUnorderedIndex *primary_index_;
-			BaseOrderedIndex **secondary_indexes_;
+			PRIMARY_IDX *primary_index_;
+			SND_IDX **secondary_indexes_;
+			const RecordSchema *const schema_ptr_;
+			const size_t secondary_count_;
 		};
+		static_assert(IsTable<ShareTable>);
 	}
 }
 

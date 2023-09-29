@@ -7,7 +7,7 @@
 
 namespace Cavalia{
 	namespace Database{
-		class ShardStorageManager : public BaseStorageManager {
+		class ShardStorageManager : public BaseStorageManager<ShardTable> {
 		public:
 			ShardStorageManager(const std::string &filename, const ShardTableLocation &table_location, bool is_thread_safe) : BaseStorageManager(filename) {
 				table_location_ = table_location;

@@ -9,9 +9,13 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Tpcc{
 			namespace AtomicProcedures{
-				class StockLevelProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class StockLevelProcedure : public StoredProcedure<Table>{
 				public:
-					StockLevelProcedure(const size_t &txn_type) : StoredProcedure(txn_type){
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+
+					StockLevelProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){
 						context_.is_read_only_ = true;
 						order_line_records = new SchemaRecords(15);
 					}

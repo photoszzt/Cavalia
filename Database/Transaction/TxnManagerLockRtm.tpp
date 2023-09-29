@@ -1,9 +1,14 @@
 #if defined(LOCK_RTM)
+#pragma once
+#ifndef TXN_MANAGER_LOCK_RTM_H_
+#define TXN_MANAGER_LOCK_RTM_H_
 #include "TransactionManager.h"
 
 namespace Cavalia {
 	namespace Database {
-		bool TransactionManager::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record) {
+
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record) {
 			BEGIN_PHASE_MEASURE(thread_id_, INSERT_PHASE);
 			// insert with visibility bit set to false.
 			record->is_visible_ = false;
@@ -31,7 +36,8 @@ namespace Cavalia {
 			}*/
 		}
 
-		bool TransactionManager::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
 			if (access_type == READ_ONLY) {
 				auto &content_ref = t_record->content_;
 				Access *access = NULL;
@@ -130,7 +136,8 @@ namespace Cavalia {
 			}
 		}
 
-		bool TransactionManager::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
 			BEGIN_PHASE_MEASURE(thread_id_, COMMIT_PHASE);
 			// acquire lock and validate
 			bool is_success = true;
@@ -365,7 +372,8 @@ namespace Cavalia {
 			return is_success;
 		}
 
-		void TransactionManager::AbortTransaction() {
+		template <typename Table> requires IsTable<Table>
+		void TransactionManager<Table>::AbortTransaction() {
 			// clean up accesses in cold access list.
 			for (size_t i = 0; i < access_list_.access_count_; ++i) {
 				Access *access_ptr = access_list_.GetAccess(i);
@@ -421,4 +429,6 @@ namespace Cavalia {
 	}
 }
 
-#endif
+#endif // TXN_MANAGER_LOCK_RTM_H_
+
+#endif // LOCK_RTM

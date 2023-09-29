@@ -9,9 +9,13 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Tpcc{
 			namespace AtomicProcedures{
-				class PaymentProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class PaymentProcedure : public StoredProcedure<Table>{
 				public:
-					PaymentProcedure(const size_t &txn_type) : StoredProcedure(txn_type){}
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+
+					PaymentProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){}
 					virtual ~PaymentProcedure(){}
 
 					virtual bool Execute(TxnParam *param, CharArray &ret, const ExeContext &exe_context){

@@ -9,9 +9,12 @@ namespace Cavalia{
 	namespace Benchmark{
 		namespace Smallbank{
 			namespace AtomicProcedures{
-				class AmalgamateProcedure : public StoredProcedure{
+				template <typename Table> requires IsTable<Table>
+				class AmalgamateProcedure : public StoredProcedure<Table>{
 				public:
-					AmalgamateProcedure(const size_t &txn_type) : StoredProcedure(txn_type){
+					using StoredProcedure<Table>::context_;
+					using StoredProcedure<Table>::transaction_manager_;
+					AmalgamateProcedure(const size_t &txn_type) : StoredProcedure<Table>(txn_type){
 						context_.is_dependent_ = true;
 					}
 					virtual ~AmalgamateProcedure(){}

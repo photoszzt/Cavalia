@@ -7,12 +7,14 @@
 namespace Cavalia{
 	namespace Benchmark{
 		using namespace Cavalia::Database;
+
+		template <typename Table> requires IsTable<Table>
 		class BenchmarkTableInitiator{
 		public:
 			BenchmarkTableInitiator(){}
 			virtual ~BenchmarkTableInitiator(){}
 
-			virtual void Initialize(BaseStorageManager *storage_manager) = 0;
+			virtual void Initialize(BaseStorageManager<Table> *storage_manager) = 0;
 
 		private:
 			BenchmarkTableInitiator(const BenchmarkTableInitiator &);

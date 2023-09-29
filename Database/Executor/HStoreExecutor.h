@@ -14,9 +14,10 @@
 
 namespace Cavalia {
 	namespace Database {
+		template <typename Table> requires IsTable<Table>
 		class HStoreExecutor : public BaseExecutor {
 		public:
-			HStoreExecutor(IORedirector *const redirector, BaseStorageManager *const storage_manager, BaseLogger *const logger, const HStoreTxnLocation &txn_location) : BaseExecutor(redirector, logger, txn_location.GetThreadCount()), storage_manager_(storage_manager), txn_location_(txn_location){
+			HStoreExecutor(IORedirector *const redirector, BaseStorageManager<Table> *const storage_manager, BaseLogger *const logger, const HStoreTxnLocation &txn_location) : BaseExecutor(redirector, logger, txn_location.GetThreadCount()), storage_manager_(storage_manager), txn_location_(txn_location){
 				is_begin_ = false;
 				is_finish_ = false;
 				total_count_ = 0;
@@ -120,7 +121,7 @@ namespace Cavalia {
 				size_t node_id = 0;
 #endif
 				HStoreContent content(spinlocks_, thread_count_);
-				TransactionManager txn_manager(storage_manager_, logger_, part_id, this->thread_count_);
+				TransactionManager<Table> txn_manager(storage_manager_, logger_, part_id, this->thread_count_);
 				StoredProcedure **procedures = new StoredProcedure*[registers_.size()];
 				for (auto &entry : registers_){
 					procedures[entry.first] = entry.second(node_id);
@@ -179,7 +180,7 @@ namespace Cavalia {
 			std::unordered_map<size_t, std::function<void(char*)>> deregisters_;
 
 		private:
-			BaseStorageManager *const storage_manager_;
+			BaseStorageManager<Table> *const storage_manager_;
 			TimeMeasurer timer_;
 			system_clock::time_point start_timestamp_;
 			system_clock::time_point end_timestamp_;

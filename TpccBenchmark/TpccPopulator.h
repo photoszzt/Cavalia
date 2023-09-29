@@ -3,6 +3,7 @@
 #define __CAVALIA_TPCC_BENCHMARK_TPCC_POPULATOR_H__
 
 #include <Benchmark/BenchmarkPopulator.h>
+#include "ClassHelper.h"
 #include "TpccRecords.h"
 #include "TpccScaleParams.h"
 #include "TpccInformation.h"
@@ -10,9 +11,11 @@
 namespace Cavalia{
 	namespace Benchmark{
 		namespace Tpcc{
-			class TpccPopulator : public BenchmarkPopulator{
+			template <typename Table> requires IsTable<Table>
+			class TpccPopulator : public BenchmarkPopulator<Table>{
 			public:
-				TpccPopulator(const TpccScaleParams *params, BaseStorageManager *storage_manager) : BenchmarkPopulator(storage_manager), scale_params_(params){}
+				using BenchmarkPopulator<Table>::storage_manager_;
+				TpccPopulator(const TpccScaleParams *params, BaseStorageManager<Table> *storage_manager) : BenchmarkPopulator<Table>(storage_manager), scale_params_(params){}
 				virtual ~TpccPopulator(){}
 
 				virtual void StartPopulate();
@@ -52,5 +55,7 @@ namespace Cavalia{
 		}
 	}
 }
+
+#include "TpccPopulator.tpp"
 
 #endif

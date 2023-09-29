@@ -1,9 +1,13 @@
 #if defined(LOCK_WAIT)
+#pragma once
+#ifndef TXN_MANAGER_LOCK_WAIT_H_
+#define TXN_MANAGER_LOCK_WAIT_H_
 #include "TransactionManager.h"
 
 namespace Cavalia{
 	namespace Database{
-		bool TransactionManager::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record){
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::InsertRecord(TxnContext *context, const size_t &table_id, const std::string &primary_key, SchemaRecord *record){
 			BEGIN_PHASE_MEASURE(thread_id_, INSERT_PHASE);
 			if (is_first_access_ == true){
 				BEGIN_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
@@ -38,7 +42,8 @@ namespace Cavalia{
 			}*/
 		}
 
-		bool TransactionManager::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::SelectRecordCC(TxnContext *context, const size_t &table_id, TableRecord *t_record, SchemaRecord *&s_record, const AccessType access_type) {
 			s_record = t_record->record_;
 			if (is_first_access_ == true){
 				BEGIN_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
@@ -116,7 +121,8 @@ namespace Cavalia{
 			}
 		}
 
-		bool TransactionManager::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
+		template <typename Table> requires IsTable<Table>
+		bool TransactionManager<Table>::CommitTransaction(TxnContext *context, TxnParam *param, CharArray &ret_str){
 			BEGIN_PHASE_MEASURE(thread_id_, COMMIT_PHASE);
 
 			BEGIN_CC_TS_ALLOC_TIME_MEASURE(thread_id_);
@@ -160,7 +166,7 @@ namespace Cavalia{
 			}
 			logger_->CommitTransaction(this->thread_id_, curr_epoch, commit_ts, context->txn_type_, param);
 #endif
-			
+
 			// release locks.
 			for (size_t i = 0; i < access_list_.access_count_; ++i){
 				Access *access_ptr = access_list_.GetAccess(i);
@@ -185,7 +191,8 @@ namespace Cavalia{
 			return true;
 		}
 
-		void TransactionManager::AbortTransaction() {
+		template <typename Table> requires IsTable<Table>
+		void TransactionManager<Table>::AbortTransaction() {
 			// recover updated data and release locks.
 			for (size_t i = 0; i < access_list_.access_count_; ++i){
 				Access *access_ptr = access_list_.GetAccess(i);
@@ -215,4 +222,6 @@ namespace Cavalia{
 	}
 }
 
-#endif
+#endif // TXN_MANAGER_LOCK_WAIT_H_
+
+#endif // LOCK_WAIT

@@ -2,25 +2,27 @@
 #ifndef __CAVALIA_DATABASE_BTREE_INDEX_H__
 #define __CAVALIA_DATABASE_BTREE_INDEX_H__
 
+#include "ClassHelper.h"
 #include <BTree/btree_map.h>
-#include "BaseOrderedIndex.h"
+// #include "BaseOrderedIndex.h"
+#include "../Storage/TableRecords.h"
 
 namespace Cavalia {
 	namespace Database {
-		class BtreeIndex : public BaseOrderedIndex {
+		class BtreeIndex {
 		public:
 			BtreeIndex(){}
-			virtual ~BtreeIndex() {}
+			~BtreeIndex() {}
 
-			virtual void InsertRecord(const std::string &key, TableRecord *record) {
+			void InsertRecord(const std::string &key, TableRecord *record) {
 				index_.insert(std::pair<std::string, TableRecord*>(key, record));
 			}
 
-			virtual void DeleteRecord(const std::string &key) {
+			void DeleteRecord(const std::string &key) {
 				index_.erase(key);
 			}
 
-			virtual TableRecord* SearchRecord(const std::string &key) {
+			TableRecord* SearchRecord(const std::string &key) {
 				if (index_.find(key) == index_.end()) {
 					return NULL;
 				}
@@ -29,7 +31,7 @@ namespace Cavalia {
 				}
 			}
 
-			virtual void SearchRecords(const std::string &key, TableRecords *records) {
+			void SearchRecords(const std::string &key, TableRecords *records) {
 				size_t num = index_.count(key);
 				if (num == 0) {
 					return;
@@ -44,13 +46,14 @@ namespace Cavalia {
 			}
 
 
-		private:
-			BtreeIndex(const BtreeIndex &);
-			BtreeIndex& operator=(const BtreeIndex &);
+			BtreeIndex(const BtreeIndex &) = delete;
+			BtreeIndex& operator=(const BtreeIndex &) = delete;
 
-		protected:
+		// protected:
 			btree::btree_multimap<std::string, TableRecord*> index_;
 		};
+		static_assert(std::is_trivial_v<BtreeIndex> == false);
+		static_assert(std::is_standard_layout_v<BtreeIndex> == true);
 	}
 }
 

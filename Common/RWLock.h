@@ -101,7 +101,6 @@ public:
 		return (lock_type_ == WRITE_LOCK);
 	}
 
-private:
 	SpinLock spinlock_;
 	volatile size_t reader_count_;
 	volatile size_t lock_type_;

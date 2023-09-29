@@ -7,7 +7,6 @@
 #include <string>
 #include <cstdint>
 
-
 template<typename T1, typename T2>
 struct BinaryKeyHash : public std::unary_function<std::tuple<T1, T2>, std::size_t>{
 	std::size_t operator()(const std::tuple<T1, T2>& k) const{

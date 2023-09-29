@@ -15,9 +15,10 @@
 namespace Cavalia{
 	namespace Database{
 
+		template <typename Table> requires IsTable<Table>
 		class BaseReplayer{
 		public:
-			BaseReplayer(const std::string &dir_name, BaseStorageManager *const storage_manager, const size_t &thread_count, bool is_vl) : dir_name_(dir_name), storage_manager_(storage_manager), thread_count_(thread_count){
+			BaseReplayer(const std::string &dir_name, BaseStorageManager<Table> *const storage_manager, const size_t &thread_count, bool is_vl) : dir_name_(dir_name), storage_manager_(storage_manager), thread_count_(thread_count){
 				infiles_ = new FILE*[thread_count_];
 				// for value logging
 				if (is_vl == true){
@@ -59,7 +60,7 @@ namespace Cavalia{
 
 		protected:
 			std::string dir_name_;
-			BaseStorageManager *const storage_manager_;
+			BaseStorageManager<Table> *const storage_manager_;
 			size_t thread_count_;
 			FILE **infiles_;
 		};

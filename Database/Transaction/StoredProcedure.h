@@ -17,6 +17,7 @@ if (transaction_manager_->statement == false) { callback; return false; }
 
 namespace Cavalia{
 	namespace Database{
+		template <typename Table> requires IsTable<Table>
 		class StoredProcedure{
 		public:
 			StoredProcedure(){
@@ -27,11 +28,11 @@ namespace Cavalia{
 			}
 			virtual ~StoredProcedure(){}
 
-			void SetStorageManager(BaseStorageManager *storage_manager) {
+			void SetStorageManager(BaseStorageManager<Table> *storage_manager) {
 				storage_manager_ = storage_manager;
 			}
 
-			void SetTransactionManager(TransactionManager *transaction_manager){
+			void SetTransactionManager(TransactionManager<Table> *transaction_manager){
 				transaction_manager_ = transaction_manager;
 			}
 
@@ -56,8 +57,8 @@ namespace Cavalia{
 
 		protected:
 			TxnContext context_;
-			BaseStorageManager *storage_manager_;
-			TransactionManager *transaction_manager_;
+			BaseStorageManager<Table> *storage_manager_;
+			TransactionManager<Table> *transaction_manager_;
 			size_t partition_count_;
 			size_t partition_id_;
 		};
