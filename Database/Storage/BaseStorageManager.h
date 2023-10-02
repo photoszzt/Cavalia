@@ -42,7 +42,7 @@ namespace Cavalia{
 					ret += std::to_string(i);
 					ret += ": ";
 					ret += std::to_string(tab_size);
-					ret += "\n";
+					ret += " B\n";
 					database_size += GetRecordSize(tm.tables_[i]) * tab_size;
 				}
 			}
