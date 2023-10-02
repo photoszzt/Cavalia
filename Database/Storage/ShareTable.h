@@ -22,11 +22,7 @@ namespace Cavalia{
 		public:
 			ShareTable(const RecordSchema * const schema_ptr, bool is_thread_safe) : schema_ptr_(schema_ptr), secondary_count_(schema_ptr->GetSecondaryCount()) {
 				// if (is_thread_safe == true){
-#if defined(CUCKOO_INDEX)
-					primary_index_ = new CuckooIndex();
-#else
-					primary_index_ = new StdUnorderedIndexMT();
-#endif
+					primary_index_ = new PRIMARY_IDX();
 					secondary_indexes_ = new SND_IDX*[secondary_count_];
 					for (size_t i = 0; i < secondary_count_; ++i){
 						secondary_indexes_[i] = new StdOrderedIndexMT();

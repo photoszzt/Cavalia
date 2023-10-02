@@ -1,6 +1,6 @@
 PROJECT (Cavalia)
 file (GLOB SRC_LIST "*.cpp")
-set(tpcc_libs mimalloc-static libpapi.a liblz4.a libnuma.a libboost_thread.a pthread rt)
+set(tpcc_libs libcuckoo mimalloc-static libpapi.a liblz4.a libnuma.a libboost_thread.a pthread rt)
 
 # TARGET_LINK_LIBRARIES (tpcc_benchmark libjemalloc.so
 # 	libcityhash.so libboost_system.so libboost_date_time.so libboost_thread.so)

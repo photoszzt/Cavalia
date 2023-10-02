@@ -1,6 +1,6 @@
 PROJECT (Cavalia)
 file (GLOB SRC_LIST "*.cpp")
-set(micro_libs mimalloc-static liblz4.a libnuma.a libpapi.a libboost_thread.a pthread rt)
+set(micro_libs libcuckoo mimalloc-static liblz4.a libnuma.a libpapi.a libboost_thread.a pthread rt)
 # TARGET_LINK_LIBRARIES (micro_benchmark libjemalloc.so libcityhash.so libpapi.so boost_system boost_date_time libboost_thread)
 
 ADD_EXECUTABLE (micro_benchmark_occ ${SRC_LIST})

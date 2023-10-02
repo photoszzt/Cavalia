@@ -1,6 +1,6 @@
 PROJECT (Cavalia)
 file (GLOB SRC_LIST "*.cpp")
-set(smallbank_libs mimalloc-static libpapi.a liblz4.a libnuma.a libboost_thread.a pthread rt)
+set(smallbank_libs libcuckoo mimalloc-static libpapi.a liblz4.a libnuma.a libboost_thread.a pthread rt)
 
 
 # TARGET_LINK_LIBRARIES (smallbank_benchmark libjemalloc.so libcityhash.so)

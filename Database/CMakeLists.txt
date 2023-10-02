@@ -1,7 +1,7 @@
 PROJECT (Cavalia)
 file (GLOB_RECURSE SRC_LIST "*.cc" "*.cpp")
-set(shared_deps liblz4.so libpapi.so)
-set(static_deps liblz4.a libpapi.a)
+set(shared_deps liblz4.so libpapi.so libcuckoo)
+set(static_deps liblz4.a libpapi.a libcuckoo)
 set(shared_deps ${shared_deps} mimalloc)
 set(static_deps ${static_deps} mimalloc-static)
 
