@@ -15,9 +15,10 @@ namespace Cavalia{
 		namespace Tpcc{
 			namespace Replayer{
 				using namespace Cavalia::Database;
-				class TpccSerialCommandReplayer : public SerialCommandReplayer{
+				template <typename Table> requires IsTable<Table>
+				class TpccSerialCommandReplayer : public SerialCommandReplayer<Table>{
 				public:
-					TpccSerialCommandReplayer(const std::string &filename, BaseStorageManager *const storage_manager, const size_t &thread_count) : SerialCommandReplayer(filename, storage_manager, thread_count){}
+					TpccSerialCommandReplayer(const std::string &filename, BaseStorageManager<Table> *const storage_manager, const size_t &thread_count) : SerialCommandReplayer(filename, storage_manager, thread_count){}
 					virtual ~TpccSerialCommandReplayer(){}
 
 				private:
