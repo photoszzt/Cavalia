@@ -15,6 +15,7 @@ MESSAGE (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/Common)
 INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/Database)
 
+add_subdirectory(ThirdParty/libcuckoo)
 ADD_SUBDIRECTORY (Database)
 ADD_SUBDIRECTORY (TpccBenchmark)
 ADD_SUBDIRECTORY (MicroBenchmark)
