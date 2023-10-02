@@ -1,9 +1,17 @@
 PROJECT (Cavalia)
 file (GLOB SRC_LIST "*.cpp")
-ADD_EXECUTABLE (smallbank_benchmark ${SRC_LIST})
+set(smallbank_libs mimalloc-static libpapi.a liblz4.a libnuma.a libboost_thread.a pthread rt)
+
 
 # TARGET_LINK_LIBRARIES (smallbank_benchmark libjemalloc.so libcityhash.so)
-TARGET_LINK_LIBRARIES (smallbank_benchmark jemalloc_pic database_static liblz4.a libpapi.a libnuma.a libboost_thread.a pthread rt)
-INSTALL (TARGETS smallbank_benchmark
+ADD_EXECUTABLE (smallbank_benchmark_occ ${SRC_LIST})
+TARGET_LINK_LIBRARIES (smallbank_benchmark_occ database_occ_static ${smallbank_libs})
+INSTALL (TARGETS smallbank_benchmark_occ
+	RUNTIME DESTINATION bin
+)
+
+ADD_EXECUTABLE (smallbank_benchmark_silo ${SRC_LIST})
+TARGET_LINK_LIBRARIES (smallbank_benchmark_silo database_silo_static ${smallbank_libs})
+INSTALL (TARGETS smallbank_benchmark_silo
 	RUNTIME DESTINATION bin
 )

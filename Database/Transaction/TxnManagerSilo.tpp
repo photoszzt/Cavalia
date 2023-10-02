@@ -210,7 +210,8 @@ namespace Cavalia{
 
 		template <typename Table> requires IsTable<Table>
 		void TransactionManager<Table>::AbortTransaction() {
-			assert(false);
+			fprintf(stderr, "%s[%d] no separate Silo abort transaction\n", __FILE__, __LINE__);
+			abort();
 		}
 	}
 }

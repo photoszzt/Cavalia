@@ -230,6 +230,7 @@ namespace Cavalia {
 
 		template <typename Table> requires IsTable<Table>
 		void TransactionManager<Table>::AbortTransaction() {
+			fprintf(stderr, "%s[%d] No separate OCC abort transaction\n", __FILE__, __LINE__);
 			abort();
 		}
 	}
