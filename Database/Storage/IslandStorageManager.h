@@ -7,7 +7,7 @@
 
 namespace Cavalia{
 	namespace Database{
-		class IslandStorageManager : public BaseStorageManager {
+		class IslandStorageManager : public BaseStorageManager<IslandTable> {
 		public:
 			IslandStorageManager(const std::string &filename, const IslandTableLocation &table_location, bool is_thread_safe) : BaseStorageManager(filename) {
 				table_location_ = table_location;
@@ -26,6 +26,7 @@ namespace Cavalia{
 			IslandTableLocation table_location_;
 			bool is_thread_safe_;
 		};
+		static_assert(IsStorageManager<IslandStorageManager, IslandTable>);
 	}
 }
 

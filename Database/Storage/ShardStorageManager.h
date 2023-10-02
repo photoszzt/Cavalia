@@ -26,6 +26,7 @@ namespace Cavalia{
 			ShardTableLocation table_location_;
 			bool is_thread_safe_;
 		};
+		static_assert(IsStorageManager<ShardStorageManager, ShardTable>);
 	}
 }
 

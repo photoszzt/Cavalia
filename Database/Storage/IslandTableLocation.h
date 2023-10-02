@@ -31,6 +31,7 @@ namespace Cavalia{
 			std::vector<size_t> node_ids_;
 			size_t partition_id_;
 		};
+		static_assert(std::is_trivial_v<IslandTableLocation> == false && std::is_standard_layout_v<IslandTableLocation> == true);
 	}
 }
 

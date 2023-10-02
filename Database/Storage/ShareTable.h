@@ -2,6 +2,7 @@
 #ifndef __CAVALIA_DATABASE_SHARE_TABLE_H__
 #define __CAVALIA_DATABASE_SHARE_TABLE_H__
 
+#include <concepts>
 #include "BaseTable.h"
 #include "ClassHelper.h"
 #include "../Index/StdUnorderedIndex.h"
@@ -31,7 +32,7 @@ namespace Cavalia{
 				// }
 			}
 
-			virtual ~ShareTable(){
+			~ShareTable(){
 				// records in the table is released by primary index.
 				delete primary_index_;
 				primary_index_ = NULL;
@@ -44,12 +45,12 @@ namespace Cavalia{
 			}
 
 			// get the number of records in this table.
-			virtual size_t GetTableSize() const {
+			size_t GetTableSize() const {
 				return primary_index_->GetSize();
 			}
 
 			///////////////////INSERT//////////////////
-			virtual bool InsertRecord(TableRecord *record){
+			bool InsertRecord(TableRecord *record){
 				SchemaRecord *record_ptr = record->record_;
 				if (primary_index_->InsertRecord(record_ptr->GetPrimaryKey(), record) == true){
 					// build secondary index here
@@ -63,7 +64,7 @@ namespace Cavalia{
 				}
 			}
 
-			virtual bool InsertRecord(const std::string &primary_key, TableRecord *record){
+			bool InsertRecord(const std::string &primary_key, TableRecord *record){
 				if (primary_index_->InsertRecord(primary_key, record) == true){
 					SchemaRecord *record_ptr = record->record_;
 					// build secondary index here
@@ -78,7 +79,7 @@ namespace Cavalia{
 			}
 
 			/////////////////////DELETE//////////////////
-			virtual void DeleteRecord(TableRecord *record){
+			void DeleteRecord(TableRecord *record){
 				SchemaRecord *record_ptr = record->record_;
 				primary_index_->DeleteRecord(record_ptr->GetPrimaryKey());
 				// update secondary index here
@@ -89,7 +90,7 @@ namespace Cavalia{
 				// TODO: deletion should rely on a garbage collector. potential memory leak!
 			}
 
-			virtual void DeleteRecord(const std::string &primary_key, TableRecord *record) {
+			void DeleteRecord(const std::string &primary_key, TableRecord *record) {
 				primary_index_->DeleteRecord(primary_key);
 				SchemaRecord *record_ptr = record->record_;
 				for (size_t i = 0; i < secondary_count_; ++i) {
@@ -98,22 +99,22 @@ namespace Cavalia{
 			}
 
 			///////////////////NEW API//////////////////
-			virtual void SelectKeyRecord(const std::string &primary_key, TableRecord *&record) const {
+			void SelectKeyRecord(const std::string &primary_key, TableRecord *&record) const {
 				record = primary_index_->SearchRecord(primary_key);
 			}
 
-			virtual void SelectKeyRecord(const size_t &part_id, const std::string &primary_key, TableRecord *&record) const {
+			void SelectKeyRecord(const size_t &part_id, const std::string &primary_key, TableRecord *&record) const {
 				(void) part_id;
 				(void) primary_key;
 				(void) record;
 				assert(false);
 			}
 
-			virtual void SelectRecord(const size_t &idx_id, const std::string &key, TableRecord *&record) const {
+			void SelectRecord(const size_t &idx_id, const std::string &key, TableRecord *&record) const {
 				record = secondary_indexes_[idx_id]->SearchRecord(key);
 			}
 
-			virtual void SelectRecord(const size_t &part_id, const size_t &idx_id, const std::string &key, TableRecord *&record) const {
+			void SelectRecord(const size_t &part_id, const size_t &idx_id, const std::string &key, TableRecord *&record) const {
 				(void) part_id;
 				(void) idx_id;
 				(void) key;
@@ -121,11 +122,11 @@ namespace Cavalia{
 				assert(false);
 			}
 
-			virtual void SelectRecords(const size_t &idx_id, const std::string &key, TableRecords *records) const {
+			void SelectRecords(const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				secondary_indexes_[idx_id]->SearchRecords(key, records);
 			}
 
-			virtual void SelectRecords(const size_t &part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
+			void SelectRecords(const size_t &part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				(void) part_id;
 				(void) idx_id;
 				(void) key;
@@ -133,11 +134,11 @@ namespace Cavalia{
 				assert(false);
 			}
 
-			virtual void SelectUpperRecords(const size_t &idx_id, const std::string &key, TableRecords *records) const {
+			void SelectUpperRecords(const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				secondary_indexes_[idx_id]->SearchUpperRecords(key, records);
 			}
 
-			virtual void SelectUpperRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
+			void SelectUpperRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				(void) part_id;
 				(void) idx_id;
 				(void) key;
@@ -145,11 +146,11 @@ namespace Cavalia{
 				assert(false);
 			}
 
-			virtual void SelectLowerRecords(const size_t &idx_id, const std::string &key, TableRecords *records) const {
+			void SelectLowerRecords(const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				secondary_indexes_[idx_id]->SearchLowerRecords(key, records);
 			}
 
-			virtual void SelectLowerRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
+			void SelectLowerRecords(const size_t part_id, const size_t &idx_id, const std::string &key, TableRecords *records) const {
 				(void) part_id;
 				(void) idx_id;
 				(void) key;
@@ -157,11 +158,11 @@ namespace Cavalia{
 				assert(false);
 			}
 
-			virtual void SelectRangeRecords(const size_t &idx_id, const std::string &lower_key, std::string &upper_key, TableRecords *records) const {
+			void SelectRangeRecords(const size_t &idx_id, const std::string &lower_key, std::string &upper_key, TableRecords *records) const {
 				secondary_indexes_[idx_id]->SearchRangeRecords(lower_key, upper_key, records);
 			}
 
-			virtual void SelectRangeRecords(const size_t part_id, const size_t &idx_id, const std::string &lower_key, const std::string &upper_key, TableRecords *records) const {
+			void SelectRangeRecords(const size_t part_id, const size_t &idx_id, const std::string &lower_key, const std::string &upper_key, TableRecords *records) const {
 				(void) part_id;
 				(void) idx_id;
 				(void) lower_key;
@@ -171,7 +172,7 @@ namespace Cavalia{
 			}
 
 
-			virtual void SaveCheckpoint(std::ofstream &out_stream){
+			void SaveCheckpoint(std::ofstream &out_stream){
 				size_t record_size = schema_ptr_->GetSchemaSize();
 				primary_index_->SaveCheckpoint(out_stream, record_size);
 			}
@@ -200,6 +201,8 @@ namespace Cavalia{
 			const size_t secondary_count_;
 		};
 		static_assert(IsTable<ShareTable>);
+		static_assert(std::is_trivial_v<ShareTable> == false);
+		static_assert(std::is_standard_layout_v<ShareTable> == true);
 	}
 }
 
