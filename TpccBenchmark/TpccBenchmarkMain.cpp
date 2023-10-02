@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
 	else if (app_type == APP_CC_EXECUTE || app_type == APP_HSTORE_EXECUTE || app_type == APP_SITE_EXECUTE){
 		assert(factor_count == 2);
 		TpccScaleParams params((int)(scale_factors[0]), scale_factors[1]);
+		std::cout << "Scale params: " << params.ToString() << std::endl;
 		BaseLogger *logger = NULL;
 		if (app_type == APP_CC_EXECUTE) {
 #if defined(COMMAND_LOGGING)
