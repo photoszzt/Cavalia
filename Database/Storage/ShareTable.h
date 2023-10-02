@@ -8,13 +8,7 @@
 #include "../Index/StdUnorderedIndexMT.h"
 #include "../Index/StdOrderedIndex.h"
 #include "../Index/StdOrderedIndexMT.h"
-#define PRIMARY_IDX StdUnorderedIndexMT
-#define SND_IDX StdOrderedIndexMT
-#if defined(CUCKOO_INDEX)
 #include "../Index/CuckooIndex.h"
-#undef PRIMARY_IDX
-#define PRIMARY_IDX CuckooIndex
-#endif
 
 namespace Cavalia{
 	namespace Database{
@@ -25,7 +19,7 @@ namespace Cavalia{
 					primary_index_ = new PRIMARY_IDX();
 					secondary_indexes_ = new SND_IDX*[secondary_count_];
 					for (size_t i = 0; i < secondary_count_; ++i){
-						secondary_indexes_[i] = new StdOrderedIndexMT();
+						secondary_indexes_[i] = new SND_IDX();
 					}
 				// }
 				// else{

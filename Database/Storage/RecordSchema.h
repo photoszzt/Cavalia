@@ -220,11 +220,11 @@ namespace Cavalia{
 				return hashcode;
 			}
 
-		private:
-			RecordSchema(const RecordSchema &);
-			RecordSchema& operator=(const RecordSchema &);
+		// private:
+			RecordSchema(const RecordSchema &) = delete;
+			RecordSchema& operator=(const RecordSchema &) = delete;
 
-		private:
+		// private:
 			size_t table_id_;
 			ColumnInfo **columns_;
 			size_t column_count_;

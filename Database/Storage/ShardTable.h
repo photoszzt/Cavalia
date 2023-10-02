@@ -11,13 +11,7 @@
 #include "../Index/StdUnorderedIndexMT.h"
 #include "../Index/StdOrderedIndex.h"
 #include "../Index/StdOrderedIndexMT.h"
-#define PRIMARY_IDX StdUnorderedIndexMT
-#define SND_IDX StdOrderedIndexMT
-#if defined(CUCKOO_INDEX)
 #include "../Index/CuckooIndex.h"
-#undef PRIMARY_IDX
-#define PRIMARY_IDX CuckooIndex
-#endif
 
 namespace Cavalia {
 	namespace Database {
@@ -26,29 +20,19 @@ namespace Cavalia {
 			ShardTable(const RecordSchema * const schema_ptr, const ShardTableLocation &table_location, bool is_thread_safe) : partition_count_(table_location.GetPartitionCount()), schema_ptr_(schema_ptr), secondary_count_(schema_ptr->GetSecondaryCount()) {
 				table_location_ = table_location;
 				// if (is_thread_safe == true){
-#if defined(CUCKOO_INDEX)
 					primary_index_ = new PRIMARY_IDX*[partition_count_];
-#else
-					primary_index_ = new PRIMARY_IDX*[partition_count_];
-#endif
 					secondary_indexes_ = new SND_IDX**[partition_count_];
 					for (size_t i = 0; i < partition_count_; ++i){
 						size_t numa_node_id = table_location.Partition2Node(i);
-#if defined(CUCKOO_INDEX)
-						CuckooIndex *p_index = (CuckooIndex*)MemAllocator::AllocNode(sizeof(CuckooIndex), numa_node_id);
-						new(p_index)CuckooIndex();
+						PRIMARY_IDX *p_index = (PRIMARY_IDX*)MemAllocator::AllocNode(sizeof(PRIMARY_IDX), numa_node_id);
+						new(p_index)PRIMARY_IDX();
 						primary_index_[i] = p_index;
-#else
-						StdUnorderedIndexMT *p_index = (StdUnorderedIndexMT*)MemAllocator::AllocNode(sizeof(StdUnorderedIndexMT), numa_node_id);
-						new(p_index)StdUnorderedIndexMT();
-						primary_index_[i] = p_index;
-#endif
 						SND_IDX **s_indexes = (SND_IDX**)MemAllocator::AllocNode(sizeof(void*)*secondary_count_, numa_node_id);
 						memset(s_indexes, 0, sizeof(void*)*secondary_count_);
 						secondary_indexes_[i] = s_indexes;
 						for (size_t j = 0; j < secondary_count_; ++j){
-							StdOrderedIndexMT *s_index = (StdOrderedIndexMT*)MemAllocator::AllocNode(sizeof(StdOrderedIndexMT), numa_node_id);
-							new(s_index)StdOrderedIndexMT();
+							SND_IDX *s_index = (SND_IDX*)MemAllocator::AllocNode(sizeof(SND_IDX), numa_node_id);
+							new(s_index)SND_IDX();
 							secondary_indexes_[i][j] = s_index;
 						}
 					}

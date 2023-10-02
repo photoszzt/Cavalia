@@ -3,9 +3,14 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/ThirdParty/libcuckoo/"
             ],
-            "defines": ["OCC"],
+            "defines": [
+                "OCC",
+                "PRIMARY_IDX=CuckooIndex",
+                "SND_IDX=StdOrderedIndexMT"
+            ],
             "cStandard": "c23",
             "cppStandard": "c++23",
             "intelliSenseMode": "linux-clang-x64",
