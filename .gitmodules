@@ -1,3 +1,6 @@
 [submodule "ThirdParty/libcuckoo"]
 	path = ThirdParty/libcuckoo
 	url = https://github.com/efficient/libcuckoo.git
+[submodule "ThirdParty/oneTBB"]
+	path = ThirdParty/oneTBB
+	url = https://github.com/oneapi-src/oneTBB.git
