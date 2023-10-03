@@ -15,6 +15,9 @@ MESSAGE (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/Common)
 INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/Database)
+INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../src/common_cpp)
+INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../src/common)
+INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../src/cxlalloc/include)
 
 add_subdirectory(ThirdParty/libcuckoo)
 add_subdirectory(ThirdParty/oneTBB)
@@ -23,11 +26,14 @@ ADD_SUBDIRECTORY (TpccBenchmark)
 ADD_SUBDIRECTORY (MicroBenchmark)
 ADD_SUBDIRECTORY (SmallbankBenchmark)
 
-add_executable(test_tbb_concurrent_hash ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_tbb_concurrent_hash.cpp)
-target_link_libraries(test_tbb_concurrent_hash TBB::tbb)
-set(tbb_shm_inc_dir
-	${CMAKE_CURRENT_SOURCE_DIR}/../../deps/interprocess
-	${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/oneTBB/include/
-	${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/libcuckoo/
-)
-target_include_directories(test_tbb_concurrent_hash PRIVATE "$<BUILD_INTERFACE:${tbb_shm_inc_dir}>")
+
+if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
+  add_executable(test_tbb_concurrent_hash ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_tbb_concurrent_hash.cpp)
+  target_link_libraries(test_tbb_concurrent_hash TBB::tbb cxl_driver_api_byte cxlalloc)
+  set(tbb_shm_inc_dir
+  	${CMAKE_CURRENT_SOURCE_DIR}/../../deps/interprocess
+  	${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/oneTBB/include/
+  	${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/libcuckoo/
+  )
+  target_include_directories(test_tbb_concurrent_hash PRIVATE "$<BUILD_INTERFACE:${tbb_shm_inc_dir}>")
+endif()
