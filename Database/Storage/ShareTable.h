@@ -10,6 +10,7 @@
 #include "../Index/StdOrderedIndex.h"
 #include "../Index/StdOrderedIndexMT.h"
 #include "../Index/CuckooIndex.h"
+#include "../Index/TbbHashIndex.h"
 
 namespace Cavalia{
 	namespace Database{

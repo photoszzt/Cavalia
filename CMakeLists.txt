@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:-g>")
 add_compile_options("$<$<COMPILE_LANGUAGE:C>:-g>")
-SET (CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -DPRIMARY_IDX=CuckooIndex -DSND_IDX=StdOrderedIndexMT"
+SET (CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -DPRIMARY_IDX=TbbHashIndex -DSND_IDX=StdOrderedIndexMT"
 	CACHE INTERNAL "compiler options" FORCE)
 SET (CMAKE_CXX_FLAGS_DEBUG "-O0" CACHE INTERNAL "compiler options" FORCE)
 SET (CMAKE_CXX_FLAGS_RELEASE "-O3" CACHE INTERNAL "compiler options" FORCE)
